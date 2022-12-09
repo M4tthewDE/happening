@@ -1,12 +1,10 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-use rocket::http::RawStr;
-use rocket_contrib::json::{Json, JsonValue};
+use happening::{create_subscription, establish_connection};
+use rocket_contrib::json::Json;
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
-extern crate rocket_contrib;
 #[macro_use]
 extern crate serde_derive;
 
@@ -19,18 +17,19 @@ fn rocket() -> rocket::Rocket {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Subscription {
+pub struct Subscription {
     target_id: String,
-    subscription_type: SubscriptionType,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-enum SubscriptionType {
-    Follow,
+    subscription_type: String,
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
-fn new_subscription(subscription: Json<Subscription>) {}
+fn new_subscription(subscription: Json<Subscription>) {
+    let mut conn = establish_connection();
+    let target_id = &subscription.target_id;
+    let subscription_type = &subscription.subscription_type;
+
+    create_subscription(&mut conn, target_id.as_str(), subscription_type.as_str())
+}
 
 #[cfg(test)]
 mod test {
