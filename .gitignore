@@ -1,3 +1,7 @@
 /target
+src/ui/target
+src/ui/dist
+
 .env
 *.db
+
