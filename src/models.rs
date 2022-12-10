@@ -1,4 +1,4 @@
-use crate::schema::subscription;
+use crate::schema::subscription::{self};
 use diesel::{Insertable, Queryable};
 
 #[derive(Queryable)]

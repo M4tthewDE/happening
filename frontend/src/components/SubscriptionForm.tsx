@@ -3,7 +3,8 @@ import { useForm } from '@mantine/form';
 import axios from 'axios';
 
 function handleSubmit(event: any) {
-    axios.post('http://localhost:8000/api/subscription', { event })
+    console.log(event);
+    axios.post('http://localhost:8000/api/subscription', event)
         .then(res => {
             console.log(res);
         })
@@ -34,7 +35,7 @@ function SubscriptionForm() {
                     label="Type"
                     placeholder="Pick one"
                     data={[
-                        { value: 'FOLLOW', label: 'Follow' },
+                        { value: 'Follow', label: 'Follow' },
                         { value: 'Sub', label: 'Subscription' },
                     ]}
                     {...form.getInputProps('subscription_type')}

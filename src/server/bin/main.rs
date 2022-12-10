@@ -1,5 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
+use std::fmt::Display;
+
 use happening::{create_subscription, establish_connection};
 use rocket::fairing::AdHoc;
 use rocket_contrib::json::Json;
@@ -32,16 +34,31 @@ fn rocket() -> rocket::Rocket {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Subscription {
     target_id: String,
-    subscription_type: String,
+    subscription_type: SubscriptionType,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub enum SubscriptionType {
+    Follow,
+    Sub,
+}
+
+impl Display for SubscriptionType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SubscriptionType::Follow => write!(f, "Follow"),
+            SubscriptionType::Sub => write!(f, "Sub"),
+        }
+    }
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
 fn new_subscription(subscription: Json<Subscription>) {
     let mut conn = establish_connection();
-    let target_id = &subscription.target_id;
-    let subscription_type = &subscription.subscription_type;
 
-    create_subscription(&mut conn, target_id.as_str(), subscription_type.as_str())
+    let target_id = &subscription.target_id;
+    let subscription_type = subscription.subscription_type.to_string();
+    create_subscription(&mut conn, target_id, &subscription_type);
 }
 
 #[cfg(test)]
