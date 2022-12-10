@@ -1,24 +1,33 @@
+use log::info;
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 #[function_component]
 fn App() -> Html {
-    let counter = use_state(|| 0);
+    let input_node_ref = use_node_ref();
+
     let onclick = {
-        let counter = counter.clone();
-        move |_| {
-            let value = *counter + 1;
-            counter.set(value);
-        }
+        let input_node_ref = input_node_ref.clone();
+        Callback::from(move |_| {
+            let input = input_node_ref.cast::<HtmlInputElement>();
+
+            if let Some(input) = input {
+                info!("{}", input.value());
+            }
+        })
     };
 
     html! {
         <div>
-            <button {onclick}>{ "+1" }</button>
-            <p>{ *counter }</p>
+            <label for="target_id">{ "Target ID:" }</label>
+            <input ref={input_node_ref} type="text" name="target_id"/>
+
+            <button {onclick}>{ "Create subscription" }</button>
         </div>
     }
 }
 
 fn main() {
+    wasm_logger::init(wasm_logger::Config::default());
     yew::Renderer::<App>::new().render();
 }
