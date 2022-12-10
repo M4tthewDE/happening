@@ -10,11 +10,8 @@ path = "src/server/bin/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rocket = "0.4.10"
+rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rocket_cors = "0.5.2"
-serde = "1.0"
-serde_json = "1.0"
-serde_derive = "1.0"
 diesel = { version = "2.0.2", features = ["sqlite"] }
 dotenvy = "0.15"
 twitch_api = "0.7.0-rc.2"
