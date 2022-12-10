@@ -1,6 +1,13 @@
-
 import { Box, Button, Group, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import axios from 'axios';
+
+function handleSubmit(event: any) {
+    axios.post('http://localhost:8000/api/subscription', { event })
+        .then(res => {
+            console.log(res);
+        })
+}
 
 function SubscriptionForm() {
     const form = useForm(
@@ -14,7 +21,7 @@ function SubscriptionForm() {
 
     return (
         <Box sx={{ maxWidth: 300 }} mx="auto">
-            <form onSubmit={form.onSubmit((values) => console.log(values))}>
+            <form onSubmit={form.onSubmit(handleSubmit)}>
                 <TextInput
                     withAsterisk
                     label="Target ID"
