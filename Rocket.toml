@@ -1,0 +1,2 @@
+[development]
+cors_allow_all = true

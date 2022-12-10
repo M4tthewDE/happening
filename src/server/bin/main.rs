@@ -1,7 +1,9 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use happening::{create_subscription, establish_connection};
+use rocket::fairing::AdHoc;
 use rocket_contrib::json::Json;
+use rocket_cors::{AllowedOrigins, CorsOptions};
 
 #[macro_use]
 extern crate rocket;
@@ -13,7 +15,18 @@ fn main() {
 }
 
 fn rocket() -> rocket::Rocket {
-    rocket::ignite().mount("/", routes![new_subscription])
+    rocket::ignite()
+        .mount("/", routes![new_subscription])
+        .attach(AdHoc::on_attach("Cors config", |rocket| {
+            match rocket.config().get_bool("cors_allow_all").unwrap_or(false) {
+                true => {
+                    let cors = CorsOptions::default().allowed_origins(AllowedOrigins::all());
+
+                    Ok(rocket.attach(cors.to_cors().unwrap()))
+                }
+                false => Ok(rocket),
+            }
+        }))
 }
 
 #[derive(Serialize, Deserialize, Debug)]
