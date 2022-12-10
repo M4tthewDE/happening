@@ -1,11 +1,10 @@
-import React from 'react';
+import SubscriptionForm from './components/SubscriptionForm';
 
-function App() {
+export default function App() {
+
   return (
-    <div className="App">
-      <header className="App-header" />
+    <div>
+      <SubscriptionForm></SubscriptionForm>
     </div>
   );
 }
-
-export default App;
