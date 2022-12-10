@@ -14,7 +14,9 @@ extern crate serde_derive;
 mod twitch;
 mod types;
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    let token = twitch::generate_token().await.unwrap();
     rocket().launch();
 }
 
