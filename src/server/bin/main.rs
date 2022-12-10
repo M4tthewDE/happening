@@ -17,7 +17,7 @@ fn main() {
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
         .mount("/", routes![new_subscription])
-        .attach(AdHoc::on_attach("Cors config", |rocket| {
+        .attach(AdHoc::on_attach("CORS", |rocket| {
             match rocket.config().get_bool("cors_allow_all").unwrap_or(false) {
                 true => {
                     let cors = CorsOptions::default().allowed_origins(AllowedOrigins::all());
