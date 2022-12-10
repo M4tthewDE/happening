@@ -12,6 +12,8 @@ extern crate rocket;
 #[macro_use]
 extern crate serde_derive;
 
+mod twitch;
+
 fn main() {
     rocket().launch();
 }
@@ -57,7 +59,9 @@ fn new_subscription(subscription: Json<Subscription>) {
     let mut conn = establish_connection();
 
     let target_id = &subscription.target_id;
+    twitch::validate_user_id(target_id);
     let subscription_type = subscription.subscription_type.to_string();
+
     create_subscription(&mut conn, target_id, &subscription_type);
 }
 
