@@ -1,11 +1,10 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-use std::fmt::Display;
-
 use happening::{create_subscription, establish_connection};
 use rocket::fairing::AdHoc;
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedOrigins, CorsOptions};
+use types::Subscription;
 
 #[macro_use]
 extern crate rocket;
@@ -13,6 +12,7 @@ extern crate rocket;
 extern crate serde_derive;
 
 mod twitch;
+mod types;
 
 fn main() {
     rocket().launch();
@@ -31,27 +31,6 @@ fn rocket() -> rocket::Rocket {
                 false => Ok(rocket),
             }
         }))
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Subscription {
-    target_id: String,
-    subscription_type: SubscriptionType,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum SubscriptionType {
-    Follow,
-    Sub,
-}
-
-impl Display for SubscriptionType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SubscriptionType::Follow => write!(f, "Follow"),
-            SubscriptionType::Sub => write!(f, "Sub"),
-        }
-    }
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
