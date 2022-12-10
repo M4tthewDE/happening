@@ -1,18 +1,21 @@
 
 import { Box, Button, Checkbox, Group, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import React from 'react';
 
 function SubscriptionForm() {
-    const form = useForm({
-        initialValues: {
-            email: '',
-            termsOfService: false,
-        },
+    const form = useForm(
+        {
+            initialValues: {
+                email: '',
+                termsOfService: false,
+            },
 
-        validate: {
-            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
-        },
-    });
+            validate: {
+                email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+            },
+        }
+    );
 
     return (
         <Box sx={{ maxWidth: 300 }} mx="auto">
