@@ -1,18 +1,13 @@
 
-import { Box, Button, Checkbox, Group, TextInput } from '@mantine/core';
+import { Box, Button, Group, Select, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import React from 'react';
 
 function SubscriptionForm() {
     const form = useForm(
         {
             initialValues: {
-                email: '',
-                termsOfService: false,
-            },
-
-            validate: {
-                email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
+                target_id: '',
+                subscription_type: 'FOLLOW',
             },
         }
     );
@@ -22,15 +17,20 @@ function SubscriptionForm() {
             <form onSubmit={form.onSubmit((values) => console.log(values))}>
                 <TextInput
                     withAsterisk
-                    label="Email"
-                    placeholder="your@email.com"
-                    {...form.getInputProps('email')}
+                    label="Target ID"
+                    placeholder="1234"
+                    {...form.getInputProps('target_id')}
                 />
 
-                <Checkbox
-                    mt="md"
-                    label="I agree to sell my privacy"
-                    {...form.getInputProps('termsOfService', { type: 'checkbox' })}
+                <Select
+                    withAsterisk
+                    label="Type"
+                    placeholder="Pick one"
+                    data={[
+                        { value: 'FOLLOW', label: 'Follow' },
+                        { value: 'Sub', label: 'Subscription' },
+                    ]}
+                    {...form.getInputProps('subscription_type')}
                 />
 
                 <Group position="right" mt="md">
