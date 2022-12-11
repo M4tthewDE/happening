@@ -1,7 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use happening::{create_subscription, establish_connection};
-use rocket::{serde::json::Json, Build, Rocket, State};
+use rocket::{http::Status, serde::json::Json, Build, Rocket, State};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use twitch::TwitchApi;
 use types::Subscription;
@@ -42,14 +42,22 @@ async fn rocket() -> Rocket<Build> {
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
-fn new_subscription(subscription: Json<Subscription>, twitch_api: &State<TwitchApi>) {
+async fn new_subscription(
+    subscription: Json<Subscription<'_>>,
+    twitch_api: &State<TwitchApi>,
+) -> (Status, &'static str) {
     let mut conn = establish_connection();
 
     let target_id = &subscription.target_id;
-    twitch_api.validate_user_id(&target_id);
+
+    if !twitch_api.is_valid_user_id(target_id).await {
+        return (Status::BadRequest, "Target user does not exist");
+    }
 
     let subscription_type = subscription.subscription_type.to_string();
     create_subscription(&mut conn, target_id, &subscription_type);
+
+    (Status::Ok, "subscription created")
 }
 
 #[cfg(test)]
@@ -61,7 +69,24 @@ mod test {
     };
 
     #[rocket::async_test]
-    async fn new_subscription() {
+    async fn new_subscription_invalid_target() {
+        let rocket = rocket().await;
+        let client = Client::tracked(rocket)
+            .await
+            .expect("valid rocket instance");
+
+        let response = client
+            .post("/api/subscription")
+            .header(ContentType::JSON)
+            .body(r#"{"target_id": "1234556", "subscription_type": "Follow"}"#)
+            .dispatch()
+            .await;
+
+        assert_eq!(response.status(), Status::BadRequest);
+    }
+
+    #[rocket::async_test]
+    async fn new_subscription_valid_target() {
         let rocket = rocket().await;
         let client = Client::tracked(rocket)
             .await

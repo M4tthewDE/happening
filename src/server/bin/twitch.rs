@@ -1,9 +1,9 @@
 use std::env;
 
 use dotenvy::dotenv;
+use twitch_api::{helix::users::GetUsersRequest, types::UserIdRef, TwitchClient};
 use twitch_oauth2::AppAccessToken;
 
-#[derive(Debug)]
 pub struct TwitchApi {
     token: AppAccessToken,
 }
@@ -17,8 +17,13 @@ impl TwitchApi {
 }
 
 impl TwitchApi {
-    pub fn validate_user_id(&self, id: &str) {
-        todo!("implement");
+    pub async fn is_valid_user_id(&self, id: &str) -> bool {
+        let client: TwitchClient<reqwest::Client> = TwitchClient::default();
+        let ids: &[_] = &[UserIdRef::from_str(id)];
+        let req = GetUsersRequest::ids(ids);
+        let response = &client.helix.req_get(req, &self.token).await.unwrap();
+
+        !response.data.is_empty()
     }
 }
 
