@@ -4,24 +4,24 @@ use dotenvy::dotenv;
 use twitch_api::{helix::users::GetUsersRequest, types::UserIdRef, TwitchClient};
 use twitch_oauth2::AppAccessToken;
 
-pub struct TwitchApi {
+pub struct TwitchApi<'a> {
     token: AppAccessToken,
+    client: TwitchClient<'a, reqwest::Client>,
 }
 
-impl TwitchApi {
-    pub async fn new() -> TwitchApi {
+impl TwitchApi<'_> {
+    pub async fn new() -> TwitchApi<'static> {
+        let client: TwitchClient<reqwest::Client> = TwitchClient::default();
         TwitchApi {
             token: generate_token().await.unwrap(),
+            client,
         }
     }
-}
 
-impl TwitchApi {
     pub async fn is_valid_user_id(&self, id: &str) -> bool {
-        let client: TwitchClient<reqwest::Client> = TwitchClient::default();
         let ids: &[_] = &[UserIdRef::from_str(id)];
         let req = GetUsersRequest::ids(ids);
-        let response = &client.helix.req_get(req, &self.token).await.unwrap();
+        let response = &self.client.helix.req_get(req, &self.token).await.unwrap();
 
         !response.data.is_empty()
     }

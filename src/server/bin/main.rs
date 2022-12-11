@@ -15,7 +15,6 @@ mod types;
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket().await.launch().await?;
-
     Ok(())
 }
 
@@ -44,10 +43,9 @@ async fn rocket() -> Rocket<Build> {
 #[post("/api/subscription", format = "json", data = "<subscription>")]
 async fn new_subscription(
     subscription: Json<Subscription<'_>>,
-    twitch_api: &State<TwitchApi>,
+    twitch_api: &State<TwitchApi<'_>>,
 ) -> (Status, &'static str) {
     let mut conn = establish_connection();
-
     let target_id = &subscription.target_id;
 
     if !twitch_api.is_valid_user_id(target_id).await {
