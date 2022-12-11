@@ -31,12 +31,12 @@ mod test {
     use super::rocket;
     use rocket::{
         http::{ContentType, Status},
-        local::Client,
+        local::blocking::Client,
     };
 
     #[test]
     fn new_subscription() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/subscription")
             .header(ContentType::JSON)
