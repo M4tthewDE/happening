@@ -3,6 +3,7 @@ use std::env;
 use dotenvy::dotenv;
 use twitch_oauth2::AppAccessToken;
 
+#[derive(Debug)]
 pub struct TwitchApi {
     token: AppAccessToken,
 }
@@ -15,8 +16,10 @@ impl TwitchApi {
     }
 }
 
-pub fn validate_user_id(id: &str) {
-    todo!("implement");
+impl TwitchApi {
+    pub fn validate_user_id(&self, id: &str) {
+        todo!("implement");
+    }
 }
 
 pub async fn generate_token() -> anyhow::Result<AppAccessToken> {
