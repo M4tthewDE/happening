@@ -60,8 +60,6 @@ async fn rocket() -> Rocket<Build> {
 
             let expires_in = redis_client.get_expires_in().unwrap();
             if expires_in.as_secs() < 300 {
-                println!("NEED NEW TOKEN");
-
                 let new_token = new_twitch_api.generate_token().await.unwrap();
                 redis_client
                     .set_token(new_token.access_token.as_str())
