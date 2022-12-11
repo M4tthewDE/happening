@@ -1,4 +1,4 @@
-use std::env;
+use std::{env, time::Duration};
 
 use anyhow::{Context, Result};
 use diesel::{
@@ -6,6 +6,7 @@ use diesel::{
     PgConnection, RunQueryDsl,
 };
 use dotenvy::dotenv;
+use redis::Commands;
 
 use crate::models::NewSubscription;
 use crate::schema::subscription;
@@ -46,5 +47,51 @@ impl Db {
             .with_context(|| "Error saving subscription")?;
 
         Ok(())
+    }
+}
+
+pub struct RedisClient {
+    con: redis::Connection,
+}
+
+impl RedisClient {
+    pub fn new() -> Result<RedisClient> {
+        let client = redis::Client::open("redis://127.0.0.1/")
+            .with_context(|| "failed to connect to redis")?;
+
+        let con = client.get_connection()?;
+
+        Ok(RedisClient { con })
+    }
+
+    pub fn set_token(&mut self, token: &str) -> Result<()> {
+        self.con
+            .set("token", token)
+            .with_context(|| "failed to set token")?;
+        Ok(())
+    }
+
+    pub fn get_token(&mut self) -> Result<String> {
+        let token: String = self
+            .con
+            .get("token")
+            .with_context(|| "failed to get token")?;
+        Ok(token)
+    }
+
+    pub fn set_expires_in(&mut self, expires_in: Duration) -> Result<()> {
+        self.con
+            .set("expires_in", expires_in.as_secs())
+            .with_context(|| "failed to set token")?;
+        Ok(())
+    }
+
+    pub fn get_expires_in(&mut self) -> Result<Duration> {
+        let expires_in: u64 = self
+            .con
+            .get("expires_in")
+            .with_context(|| "failed to get token")?;
+
+        Ok(Duration::from_secs(expires_in))
     }
 }

@@ -16,7 +16,7 @@ reqwest = "0.11.4"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 anyhow = "1.0.66"
 thiserror = "1.0.37"
-
+redis = "0.22.1"
 
 [dependencies.rocket_contrib]
 version = "0.4.10"
