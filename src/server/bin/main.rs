@@ -1,8 +1,8 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use happening::{create_subscription, establish_connection};
-use rocket::{fairing::AdHoc, serde::json::Json, Build, Rocket};
-use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
+use rocket::serde::json::Json;
+use rocket_cors::{AllowedOrigins, CorsOptions};
 use types::Subscription;
 
 #[macro_use]
@@ -30,20 +30,6 @@ fn rocket() -> _ {
     };
 
     rocket.mount("/", routes![new_subscription])
-}
-
-fn get_cors() -> Cors {
-    if rocket::Config::figment()
-        .extract_inner("cors_allow_all")
-        .unwrap_or(false)
-    {
-        return CorsOptions::default()
-            .allowed_origins(AllowedOrigins::all())
-            .to_cors()
-            .unwrap();
-    } else {
-        return CorsOptions::default().to_cors().unwrap();
-    }
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
