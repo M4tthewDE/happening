@@ -21,7 +21,7 @@ pub struct Db {
 
 impl Db {
     pub fn new() -> Result<Db> {
-        dotenv().ok();
+        dotenv().with_context(|| "Error loading .env")?;
 
         let db_url =
             env::var("DATABASE_URL").with_context(|| "DATABASE_URL must be set".to_string())?;
@@ -29,7 +29,7 @@ impl Db {
         let manager = ConnectionManager::<PgConnection>::new(db_url);
         let pool = r2d2::Pool::builder()
             .build(manager)
-            .with_context(|| "DATABASE_URL must be set".to_string())?;
+            .with_context(|| "DATABASE_URL must be set")?;
 
         Ok(Db { pool })
     }
