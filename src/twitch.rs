@@ -31,7 +31,7 @@ impl TwitchApi<'_> {
     }
 }
 
-pub async fn generate_token() -> anyhow::Result<AppAccessToken> {
+async fn generate_token() -> Result<AppAccessToken> {
     dotenv().with_context(|| "Error loading .env")?;
 
     let client_id = env::var("TWITCH_CLIENT_ID")
