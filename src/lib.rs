@@ -1,6 +1,9 @@
 use std::env;
 
-use diesel::{Connection, RunQueryDsl, SqliteConnection};
+use diesel::{
+    r2d2::{self, ConnectionManager, Pool},
+    PgConnection, RunQueryDsl,
+};
 use dotenvy::dotenv;
 
 use crate::models::NewSubscription;
@@ -8,14 +11,18 @@ use crate::models::NewSubscription;
 pub mod models;
 pub mod schema;
 
-pub fn establish_connection() -> SqliteConnection {
+pub fn establish_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
     dotenv().ok();
 
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    SqliteConnection::establish(&db_url).unwrap_or_else(|_| panic!("Error connecting to {db_url}"))
+    let manager = ConnectionManager::<PgConnection>::new(&db_url);
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
+    pool
 }
 
-pub fn create_subscription(conn: &mut SqliteConnection, target_id: &str, subscription_type: &str) {
+pub fn create_subscription(conn: &mut PgConnection, target_id: &str, subscription_type: &str) {
     use crate::schema::subscription;
 
     let new_subscription = NewSubscription {
