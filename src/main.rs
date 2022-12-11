@@ -88,7 +88,12 @@ async fn new_subscription(
     api_state: &State<ApiState<'_>>,
 ) -> (Status, &'static str) {
     let target_id = &subscription.target_id;
-    let token = api_state.redis_client.lock().unwrap().get_token().unwrap();
+    let token = match api_state.redis_client.lock().unwrap().get_token() {
+        Ok(token) => token,
+        Err(_) => {
+            return (Status::InternalServerError, "error fetching token");
+        }
+    };
 
     match api_state
         .twitch_api
