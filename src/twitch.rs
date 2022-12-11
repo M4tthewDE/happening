@@ -1,6 +1,6 @@
-use std::env;
-
+use anyhow::{Context, Result};
 use dotenvy::dotenv;
+use std::env;
 use twitch_api::{helix::users::GetUsersRequest, types::UserIdRef, TwitchClient};
 use twitch_oauth2::AppAccessToken;
 
@@ -10,35 +10,39 @@ pub struct TwitchApi<'a> {
 }
 
 impl TwitchApi<'_> {
-    pub async fn new() -> TwitchApi<'static> {
+    pub async fn new() -> Result<TwitchApi<'static>> {
         let client: TwitchClient<reqwest::Client> = TwitchClient::default();
-        TwitchApi {
-            token: generate_token().await.unwrap(),
-            client,
-        }
+        let token = generate_token().await?;
+
+        Ok(TwitchApi { token, client })
     }
 
-    pub async fn is_valid_user_id(&self, id: &str) -> bool {
+    pub async fn is_valid_user_id(&self, id: &str) -> Result<bool> {
         let ids: &[_] = &[UserIdRef::from_str(id)];
         let req = GetUsersRequest::ids(ids);
-        let response = &self.client.helix.req_get(req, &self.token).await.unwrap();
+        let response = &self
+            .client
+            .helix
+            .req_get(req, &self.token)
+            .await
+            .with_context(|| "Error fetching user")?;
 
-        !response.data.is_empty()
+        Ok(!response.data.is_empty())
     }
 }
 
 pub async fn generate_token() -> anyhow::Result<AppAccessToken> {
-    dotenv().ok();
+    dotenv().with_context(|| "Error loading .env")?;
 
     let client_id = env::var("TWITCH_CLIENT_ID")
         .ok()
         .map(twitch_oauth2::ClientId::new)
-        .expect("TWITCH_CLIENT_ID not set");
+        .with_context(|| "TWITCH_CLIENT_ID not set")?;
 
     let client_secret = env::var("TWITCH_CLIENT_SECRET")
         .ok()
         .map(twitch_oauth2::ClientSecret::new)
-        .expect("TWITCH_CLIENT_SECRET not set");
+        .with_context(|| "TWITCH_CLIENT_SECRET not set")?;
 
     let reqwest = reqwest::Client::builder().build()?;
     let token = twitch_oauth2::AppAccessToken::get_app_access_token(

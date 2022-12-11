@@ -33,7 +33,7 @@ async fn rocket() -> Rocket<Build> {
         rocket::build()
     };
 
-    let twitch_api = twitch::TwitchApi::new().await;
+    let twitch_api = twitch::TwitchApi::new().await.unwrap();
     let db = Db::new().unwrap();
 
     rocket
@@ -50,9 +50,14 @@ async fn new_subscription(
 ) -> (Status, &'static str) {
     let target_id = &subscription.target_id;
 
-    if !twitch_api.is_valid_user_id(target_id).await {
-        return (Status::BadRequest, "Target user does not exist");
-    }
+    match twitch_api.is_valid_user_id(target_id).await {
+        Ok(is_valid) => {
+            if !is_valid {
+                return (Status::BadRequest, "Target user does not exist");
+            }
+        }
+        Err(_) => return (Status::InternalServerError, "error accesing twitch api"),
+    };
 
     let subscription_type = subscription.subscription_type.to_string();
 
