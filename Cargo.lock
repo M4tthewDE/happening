@@ -1669,13 +1669,13 @@ dependencies = [
 
 [[package]]
 name = "rocket_cors"
-version = "0.5.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea20696dc46308d0ca06222905fe38e02b8e46c087af9c82ea85cdc386271076"
+version = "0.6.0-alpha1"
+source = "git+https://github.com/lawliet89/rocket_cors?branch=master#c17e8145baa4790319fdb6a473e465b960f55e7c"
 dependencies = [
+ "http",
  "log 0.4.17",
  "regex",
- "rocket 0.4.11",
+ "rocket 0.5.0-rc.2",
  "serde",
  "serde_derive",
  "unicase 2.6.0",

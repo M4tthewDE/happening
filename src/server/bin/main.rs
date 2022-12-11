@@ -2,6 +2,7 @@
 
 use happening::{create_subscription, establish_connection};
 use rocket::serde::json::Json;
+use rocket_cors::CorsOptions;
 use types::Subscription;
 
 #[macro_use]
@@ -12,7 +13,22 @@ mod types;
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build().mount("/", routes![new_subscription])
+    match rocket::Config::figment()
+        .extract_inner("cors_allow_all")
+        .unwrap_or(false)
+    {
+        true => {
+            let cors = CorsOptions {
+                ..Default::default()
+            }
+            .to_cors()
+            .unwrap();
+            rocket::build()
+                .mount("/", routes![new_subscription])
+                .attach(cors)
+        }
+        false => rocket::build().mount("/", routes![new_subscription]),
+    }
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
