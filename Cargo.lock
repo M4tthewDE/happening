@@ -785,6 +785,7 @@ dependencies = [
  "rocket 0.5.0-rc.2",
  "rocket_contrib",
  "rocket_cors",
+ "thiserror",
  "tokio",
  "twitch_api",
  "twitch_oauth2",

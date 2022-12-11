@@ -1,5 +1,6 @@
 use std::env;
 
+use anyhow::{Context, Result};
 use diesel::{
     r2d2::{self, ConnectionManager, Pool},
     PgConnection, RunQueryDsl,
@@ -19,19 +20,21 @@ pub struct Db {
 }
 
 impl Db {
-    pub fn new() -> Db {
+    pub fn new() -> Result<Db> {
         dotenv().ok();
 
-        let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-        let manager = ConnectionManager::<PgConnection>::new(&db_url);
+        let db_url =
+            env::var("DATABASE_URL").with_context(|| "DATABASE_URL must be set".to_string())?;
+
+        let manager = ConnectionManager::<PgConnection>::new(db_url);
         let pool = r2d2::Pool::builder()
             .build(manager)
-            .expect("Failed to create pool.");
+            .with_context(|| "DATABASE_URL must be set".to_string())?;
 
-        Db { pool }
+        Ok(Db { pool })
     }
 
-    pub fn save_subscription(&self, target_id: &str, subscription_type: &str) {
+    pub fn save_subscription(&self, target_id: &str, subscription_type: &str) -> Result<()> {
         let new_subscription = NewSubscription {
             target_id,
             subscription_type,
@@ -40,6 +43,8 @@ impl Db {
         diesel::insert_into(subscription::table)
             .values(&new_subscription)
             .execute(&mut self.pool.get().unwrap())
-            .expect("Error saving subscription");
+            .with_context(|| "Error saving subscription")?;
+
+        Ok(())
     }
 }

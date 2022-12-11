@@ -34,7 +34,7 @@ async fn rocket() -> Rocket<Build> {
     };
 
     let twitch_api = twitch::TwitchApi::new().await;
-    let db = Db::new();
+    let db = Db::new().unwrap();
 
     rocket
         .mount("/", routes![new_subscription])
@@ -55,9 +55,11 @@ async fn new_subscription(
     }
 
     let subscription_type = subscription.subscription_type.to_string();
-    db.save_subscription(target_id, &subscription_type);
 
-    (Status::Ok, "subscription created")
+    match db.save_subscription(target_id, &subscription_type) {
+        Err(_) => (Status::InternalServerError, "error accesing database"),
+        Ok(_) => (Status::Ok, "subscription created"),
+    }
 }
 
 #[cfg(test)]
