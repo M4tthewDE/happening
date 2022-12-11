@@ -1,10 +1,6 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-use diesel::{
-    r2d2::{ConnectionManager, Pool},
-    PgConnection,
-};
-use happening::{create_subscription, establish_connection_pool};
+use happening::Db;
 use rocket::{http::Status, serde::json::Json, Build, Rocket, State};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use twitch::TwitchApi;
@@ -15,8 +11,6 @@ extern crate rocket;
 
 mod twitch;
 mod types;
-
-pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
@@ -40,19 +34,19 @@ async fn rocket() -> Rocket<Build> {
     };
 
     let twitch_api = twitch::TwitchApi::new().await;
-    let db_pool: DbPool = establish_connection_pool();
+    let db = Db::new();
 
     rocket
         .mount("/", routes![new_subscription])
         .manage(twitch_api)
-        .manage(db_pool)
+        .manage(db)
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
 async fn new_subscription(
     subscription: Json<Subscription<'_>>,
     twitch_api: &State<TwitchApi<'_>>,
-    db_pool: &State<DbPool>,
+    db: &State<Db>,
 ) -> (Status, &'static str) {
     let target_id = &subscription.target_id;
 
@@ -61,8 +55,7 @@ async fn new_subscription(
     }
 
     let subscription_type = subscription.subscription_type.to_string();
-    let mut conn = db_pool.get().unwrap();
-    create_subscription(&mut conn, target_id, &subscription_type);
+    db.save_subscription(target_id, &subscription_type);
 
     (Status::Ok, "subscription created")
 }

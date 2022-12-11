@@ -7,31 +7,39 @@ use diesel::{
 use dotenvy::dotenv;
 
 use crate::models::NewSubscription;
+use crate::schema::subscription;
 
 pub mod models;
 pub mod schema;
 
-pub fn establish_connection_pool() -> Pool<ConnectionManager<PgConnection>> {
-    dotenv().ok();
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager = ConnectionManager::<PgConnection>::new(&db_url);
-    let pool = r2d2::Pool::builder()
-        .build(manager)
-        .expect("Failed to create pool.");
-    pool
+pub struct Db {
+    pool: DbPool,
 }
 
-pub fn create_subscription(conn: &mut PgConnection, target_id: &str, subscription_type: &str) {
-    use crate::schema::subscription;
+impl Db {
+    pub fn new() -> Db {
+        dotenv().ok();
 
-    let new_subscription = NewSubscription {
-        target_id,
-        subscription_type,
-    };
+        let db_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let manager = ConnectionManager::<PgConnection>::new(&db_url);
+        let pool = r2d2::Pool::builder()
+            .build(manager)
+            .expect("Failed to create pool.");
 
-    diesel::insert_into(subscription::table)
-        .values(&new_subscription)
-        .execute(conn)
-        .expect("Error saving subscription");
+        Db { pool }
+    }
+
+    pub fn save_subscription(&self, target_id: &str, subscription_type: &str) {
+        let new_subscription = NewSubscription {
+            target_id,
+            subscription_type,
+        };
+
+        diesel::insert_into(subscription::table)
+            .values(&new_subscription)
+            .execute(&mut self.pool.get().unwrap())
+            .expect("Error saving subscription");
+    }
 }
