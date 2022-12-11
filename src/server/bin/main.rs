@@ -1,42 +1,38 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use happening::{create_subscription, establish_connection};
-use rocket::fairing::AdHoc;
-use rocket_contrib::json::Json;
-use rocket_cors::{AllowedOrigins, CorsOptions};
+use rocket::serde::json::Json;
+use rocket_cors::CorsOptions;
 use types::Subscription;
 
 #[macro_use]
 extern crate rocket;
-#[macro_use]
-extern crate serde_derive;
 
 mod twitch;
 mod types;
 
-#[tokio::main]
-async fn main() {
-    let token = twitch::generate_token().await.unwrap();
-    rocket().launch();
-}
-
-fn rocket() -> rocket::Rocket {
-    rocket::ignite()
-        .mount("/", routes![new_subscription])
-        .attach(AdHoc::on_attach("CORS", |rocket| {
-            match rocket.config().get_bool("cors_allow_all").unwrap_or(false) {
-                true => {
-                    let cors = CorsOptions::default().allowed_origins(AllowedOrigins::all());
-
-                    Ok(rocket.attach(cors.to_cors().unwrap()))
-                }
-                false => Ok(rocket),
+#[launch]
+fn rocket() -> _ {
+    match rocket::Config::figment()
+        .extract_inner("cors_allow_all")
+        .unwrap_or(false)
+    {
+        true => {
+            let cors = CorsOptions {
+                ..Default::default()
             }
-        }))
+            .to_cors()
+            .unwrap();
+            rocket::build()
+                .mount("/", routes![new_subscription])
+                .attach(cors)
+        }
+        false => rocket::build().mount("/", routes![new_subscription]),
+    }
 }
 
 #[post("/api/subscription", format = "json", data = "<subscription>")]
-fn new_subscription(subscription: Json<Subscription>) {
+fn new_subscription(subscription: Json<Subscription<'_>>) {
     let mut conn = establish_connection();
 
     let target_id = &subscription.target_id;
@@ -51,12 +47,12 @@ mod test {
     use super::rocket;
     use rocket::{
         http::{ContentType, Status},
-        local::Client,
+        local::blocking::Client,
     };
 
     #[test]
     fn new_subscription() {
-        let client = Client::new(rocket()).expect("valid rocket instance");
+        let client = Client::tracked(rocket()).expect("valid rocket instance");
         let response = client
             .post("/api/subscription")
             .header(ContentType::JSON)
