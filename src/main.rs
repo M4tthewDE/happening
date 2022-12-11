@@ -86,37 +86,32 @@ async fn rocket() -> Rocket<Build> {
 async fn new_subscription(
     subscription: Json<Subscription<'_>>,
     api_state: &State<ApiState<'_>>,
-) -> (Status, &'static str) {
+) -> Result<(), Status> {
     let target_id = &subscription.target_id;
-    let token = match api_state.redis_client.lock().unwrap().get_token() {
-        Ok(token) => token,
-        Err(_) => {
-            return (Status::InternalServerError, "error fetching token");
-        }
-    };
+    let token = api_state
+        .redis_client
+        .lock()
+        .unwrap()
+        .get_token()
+        .map_err(|_| Status::InternalServerError)?;
 
-    match api_state
+    let is_valid = api_state
         .twitch_api
         .is_valid_user_id(token, target_id)
         .await
-    {
-        Ok(is_valid) => {
-            if !is_valid {
-                return (Status::BadRequest, "Target user does not exist");
-            }
-        }
-        Err(_) => return (Status::InternalServerError, "error accesing twitch api"),
-    };
+        .map_err(|_| Status::InternalServerError)?;
+
+    if !is_valid {
+        return Err(Status::BadRequest);
+    }
 
     let subscription_type = subscription.subscription_type.to_string();
-
-    match api_state
+    api_state
         .db
         .save_subscription(target_id, &subscription_type)
-    {
-        Err(_) => (Status::InternalServerError, "error accesing database"),
-        Ok(_) => (Status::Ok, "subscription created"),
-    }
+        .map_err(|_| Status::InternalServerError)?;
+
+    Ok(())
 }
 
 #[cfg(test)]
