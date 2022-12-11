@@ -56,7 +56,7 @@ async fn rocket() -> Rocket<Build> {
         let mut redis_client = RedisClient::new().unwrap();
 
         loop {
-            time::sleep(Duration::from_secs(1)).await;
+            time::sleep(Duration::from_secs(60)).await;
 
             let expires_in = redis_client.get_expires_in().unwrap();
             if expires_in.as_secs() < 300 {
