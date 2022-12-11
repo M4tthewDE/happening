@@ -1,8 +1,8 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use happening::{create_subscription, establish_connection};
-use rocket::serde::json::Json;
-use rocket_cors::CorsOptions;
+use rocket::{fairing::AdHoc, serde::json::Json, Build, Rocket};
+use rocket_cors::{AllowedOrigins, Cors, CorsOptions};
 use types::Subscription;
 
 #[macro_use]
@@ -13,21 +13,36 @@ mod types;
 
 #[launch]
 fn rocket() -> _ {
-    match rocket::Config::figment()
+    let twitch_api = twitch::TwitchApi::new();
+
+    let rocket = if rocket::Config::figment()
         .extract_inner("cors_allow_all")
         .unwrap_or(false)
     {
-        true => {
-            let cors = CorsOptions {
-                ..Default::default()
-            }
+        rocket::build().attach(
+            CorsOptions::default()
+                .allowed_origins(AllowedOrigins::all())
+                .to_cors()
+                .unwrap(),
+        )
+    } else {
+        rocket::build()
+    };
+
+    rocket.mount("/", routes![new_subscription])
+}
+
+fn get_cors() -> Cors {
+    if rocket::Config::figment()
+        .extract_inner("cors_allow_all")
+        .unwrap_or(false)
+    {
+        return CorsOptions::default()
+            .allowed_origins(AllowedOrigins::all())
             .to_cors()
             .unwrap();
-            rocket::build()
-                .mount("/", routes![new_subscription])
-                .attach(cors)
-        }
-        false => rocket::build().mount("/", routes![new_subscription]),
+    } else {
+        return CorsOptions::default().to_cors().unwrap();
     }
 }
 
