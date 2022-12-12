@@ -99,6 +99,7 @@ impl TwitchApi {
                 ("client_secret", &self.secret),
                 ("grant_type", &"client_credentials".to_string()),
             ])
+            .json(&body)
             .send()
             .await
             .with_context(|| "token request failed")?;
