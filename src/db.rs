@@ -8,11 +8,7 @@ use diesel::{
 use dotenvy::dotenv;
 use redis::Commands;
 
-use crate::models::NewSubscription;
-use crate::schema::subscription;
-
-pub mod models;
-pub mod schema;
+use crate::{models::NewSubscription, schema::subscription, twitch::AppAccessToken};
 
 pub type DbPool = Pool<ConnectionManager<PgConnection>>;
 
@@ -64,10 +60,15 @@ impl RedisClient {
         Ok(RedisClient { con })
     }
 
-    pub fn set_token(&mut self, token: &str) -> Result<()> {
+    pub fn save_token(&mut self, token: AppAccessToken) -> Result<()> {
         self.con
-            .set("token", token)
+            .set("token", token.access_token)
             .with_context(|| "failed to set token")?;
+
+        self.con
+            .set("expires_in", token.expires_in.as_secs())
+            .with_context(|| "failed to set token")?;
+
         Ok(())
     }
 
@@ -77,13 +78,6 @@ impl RedisClient {
             .get("token")
             .with_context(|| "failed to get token")?;
         Ok(token)
-    }
-
-    pub fn set_expires_in(&mut self, expires_in: Duration) -> Result<()> {
-        self.con
-            .set("expires_in", expires_in.as_secs())
-            .with_context(|| "failed to set token")?;
-        Ok(())
     }
 
     pub fn get_expires_in(&mut self) -> Result<Duration> {
