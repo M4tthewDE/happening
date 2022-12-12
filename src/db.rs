@@ -31,10 +31,16 @@ impl Db {
         Ok(Db { pool })
     }
 
-    pub fn save_subscription(&self, target_id: &str, subscription_type: &str) -> Result<()> {
+    pub fn save_subscription(
+        &self,
+        target_id: &str,
+        subscription_type: &str,
+        eventsub_id: &str,
+    ) -> Result<()> {
         let new_subscription = NewSubscription {
             target_id,
             subscription_type,
+            eventsub_id,
         };
 
         diesel::insert_into(subscription::table)

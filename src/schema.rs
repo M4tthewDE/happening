@@ -5,5 +5,6 @@ diesel::table! {
         subscription_id -> Int4,
         target_id -> Varchar,
         subscription_type -> Varchar,
+        eventsub_id -> Varchar,
     }
 }

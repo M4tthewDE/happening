@@ -120,7 +120,7 @@ async fn new_subscription(
 
     // register at twitch
     // TODO save response (id for verification) in db
-    twitch_api
+    let resp = twitch_api
         .create_eventsub(
             token,
             subscription.subscription_type.get_twitch_type(),
@@ -130,8 +130,9 @@ async fn new_subscription(
         .await
         .map_err(|_| Status::InternalServerError)?;
 
+    let eventsub_id = &resp.data.get(0).ok_or(Status::InternalServerError)?.id;
     let subscription_type = subscription.subscription_type.to_string();
-    db.save_subscription(target_id, &subscription_type)
+    db.save_subscription(target_id, &subscription_type, eventsub_id)
         .map_err(|_| Status::InternalServerError)?;
 
     Ok(())

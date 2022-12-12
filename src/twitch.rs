@@ -89,7 +89,7 @@ impl TwitchApi {
         sub_type: String,
         user_id: String,
         callback: String,
-    ) -> Result<()> {
+    ) -> Result<CreateEventsubResponseBody> {
         let body =
             CreateEventsubBody::new(sub_type, user_id, callback, self.eventsub_secret.clone());
         let res = self
@@ -113,8 +113,19 @@ impl TwitchApi {
             bail!("error creating eventsub: {}", status);
         }
 
-        Ok(())
+        let body: CreateEventsubResponseBody = res.json().await?;
+        Ok(body)
     }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct CreateEventsubResponseBody {
+    pub data: Vec<CreateEventsubResponseData>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct CreateEventsubResponseData {
+    pub id: String,
 }
 
 #[derive(Serialize, Debug)]
