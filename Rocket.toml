@@ -1,3 +1,0 @@
-[debug]
-cors_allow_all = true
-callback = "https://1b22-109-192-119-145.ngrok.io/api/twitch/eventsub"
