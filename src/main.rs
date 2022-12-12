@@ -7,7 +7,6 @@ use rocket::{http::Status, serde::json::Json, Build, Rocket, State};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use tokio::{task, time};
 use twitch::TwitchApi;
-use twitch_oauth2::TwitchToken;
 use types::Subscription;
 
 #[macro_use]
@@ -16,8 +15,8 @@ extern crate rocket;
 mod twitch;
 mod types;
 
-struct ApiState<'a> {
-    twitch_api: TwitchApi<'a>,
+struct ApiState {
+    twitch_api: TwitchApi,
     redis_client: Mutex<RedisClient>,
     db: Db,
 }
@@ -48,7 +47,7 @@ async fn rocket() -> Rocket<Build> {
     let mut redis_client = RedisClient::new().unwrap();
     let token = twitch_api.generate_token().await.unwrap();
     redis_client.set_token(token.access_token.as_str()).unwrap();
-    redis_client.set_expires_in(token.expires_in()).unwrap();
+    redis_client.set_expires_in(token.expires_in).unwrap();
 
     // start token refresh loop
     let new_twitch_api = twitch_api.clone();
@@ -56,7 +55,7 @@ async fn rocket() -> Rocket<Build> {
         let mut redis_client = RedisClient::new().unwrap();
 
         loop {
-            time::sleep(Duration::from_secs(60)).await;
+            time::sleep(Duration::from_secs(1)).await;
 
             let expires_in = redis_client.get_expires_in().unwrap();
             if expires_in.as_secs() < 300 {
@@ -64,7 +63,7 @@ async fn rocket() -> Rocket<Build> {
                 redis_client
                     .set_token(new_token.access_token.as_str())
                     .unwrap();
-                redis_client.set_expires_in(new_token.expires_in()).unwrap();
+                redis_client.set_expires_in(new_token.expires_in).unwrap();
             }
         }
     });
@@ -85,7 +84,7 @@ async fn rocket() -> Rocket<Build> {
 #[post("/api/subscription", format = "json", data = "<subscription>")]
 async fn new_subscription(
     subscription: Json<Subscription<'_>>,
-    api_state: &State<ApiState<'_>>,
+    api_state: &State<ApiState>,
 ) -> Result<(), Status> {
     let target_id = &subscription.target_id;
     let token = api_state

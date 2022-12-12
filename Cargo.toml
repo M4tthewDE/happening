@@ -10,9 +10,8 @@ rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rocket_cors = { git = "https://github.com/lawliet89/rocket_cors", branch = "master" }
 diesel = { version = "2.0.2", features = ["postgres", "r2d2", "chrono"] }
 dotenvy = "0.15"
-twitch_api = { version = "0.7.0-rc.2", features = ["client", "reqwest", "helix"] }
-twitch_oauth2 = { version = "0.9.2", features = ["client", "reqwest"] }
-reqwest = "0.11.4"
+reqwest = { version = "0.11.4", features = ["json"] }
+serde = { version = "1.0", features = ["derive"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 anyhow = "1.0.66"
 thiserror = "1.0.37"
