@@ -39,7 +39,7 @@ impl Db {
 
         diesel::insert_into(subscription::table)
             .values(&new_subscription)
-            .execute(&mut self.pool.get().unwrap())
+            .execute(&mut self.pool.get()?)
             .with_context(|| "Error saving subscription")?;
 
         Ok(())
