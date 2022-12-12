@@ -716,6 +716,7 @@ dependencies = [
  "anyhow",
  "diesel",
  "dotenvy",
+ "rand",
  "redis",
  "reqwest",
  "rocket 0.5.0-rc.2",

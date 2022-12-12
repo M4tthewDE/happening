@@ -16,6 +16,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 anyhow = "1.0.66"
 thiserror = "1.0.37"
 redis = "0.22.1"
+rand = "0.8.5"
 
 [dependencies.rocket_contrib]
 version = "0.4.10"

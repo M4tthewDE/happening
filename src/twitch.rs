@@ -2,13 +2,15 @@ use std::{env, time::Duration};
 
 use anyhow::{bail, Context, Result};
 use dotenvy::dotenv;
-use serde::Deserialize;
+use rand::{distributions::Alphanumeric, Rng};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone)]
 pub struct TwitchApi {
     secret: String,
     client_id: String,
     reqwest: reqwest::Client,
+    eventsub_secret: String,
 }
 
 impl TwitchApi {
@@ -24,11 +26,17 @@ impl TwitchApi {
             .with_context(|| "TWITCH_CLIENT_ID not set")?;
 
         let reqwest = reqwest::Client::builder().build()?;
+        let eventsub_secret = rand::thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(16)
+            .map(char::from)
+            .collect();
 
         Ok(TwitchApi {
             secret,
             client_id,
             reqwest,
+            eventsub_secret,
         })
     }
 
@@ -74,6 +82,73 @@ impl TwitchApi {
         let body: UserBody = res.json().await?;
         Ok(!body.data.is_empty())
     }
+
+    pub async fn create_eventsub(
+        &self,
+        sub_type: String,
+        user_id: String,
+        callback: String,
+    ) -> Result<()> {
+        let body =
+            CreateEventsubBody::new(sub_type, user_id, callback, self.eventsub_secret.clone());
+        let res = self
+            .reqwest
+            .post("https://id.twitch.tv/oauth2/token")
+            .query(&[
+                ("client_id", &self.client_id),
+                ("client_secret", &self.secret),
+                ("grant_type", &"client_credentials".to_string()),
+            ])
+            .send()
+            .await
+            .with_context(|| "token request failed")?;
+
+        if !res.status().is_success() {
+            bail!("error creating eventsub: {}", res.status());
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Serialize)]
+struct CreateEventsubBody {
+    sub_type: String,
+    version: String,
+    condition: CreateCondition,
+    transport: CreateTransport,
+}
+
+impl CreateEventsubBody {
+    fn new(
+        sub_type: String,
+        user_id: String,
+        callback: String,
+        secret: String,
+    ) -> CreateEventsubBody {
+        CreateEventsubBody {
+            sub_type,
+            version: "1".to_string(),
+            condition: CreateCondition { user_id },
+            transport: CreateTransport {
+                method: "webhook".to_string(),
+                callback,
+                secret,
+            },
+        }
+    }
+}
+
+#[derive(Serialize)]
+struct CreateCondition {
+    user_id: String,
+}
+
+#[derive(Serialize)]
+struct CreateTransport {
+    method: String,
+    callback: String,
+    secret: String,
 }
 
 #[derive(Deserialize)]
