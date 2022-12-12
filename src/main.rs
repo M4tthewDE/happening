@@ -24,6 +24,12 @@ struct ApiState {
     db: Db,
 }
 
+impl ApiState {
+    fn get_all(&self) -> (&TwitchApi, &Mutex<RedisClient>, &Db) {
+        (&self.twitch_api, &self.redis_client, &self.db)
+    }
+}
+
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     let _rocket = rocket().await.launch().await?;
@@ -85,16 +91,16 @@ async fn new_subscription(
     subscription: Json<Subscription<'_>>,
     api_state: &State<ApiState>,
 ) -> Result<(), Status> {
+    let (twitch_api, redis_client, db) = api_state.get_all();
+
     let target_id = &subscription.target_id;
-    let token = api_state
-        .redis_client
+    let token = redis_client
         .lock()
         .unwrap()
         .get_token()
         .map_err(|_| Status::InternalServerError)?;
 
-    let is_valid = api_state
-        .twitch_api
+    let is_valid = twitch_api
         .is_valid_user_id(token, target_id)
         .await
         .map_err(|_| Status::InternalServerError)?;
@@ -104,9 +110,7 @@ async fn new_subscription(
     }
 
     let subscription_type = subscription.subscription_type.to_string();
-    api_state
-        .db
-        .save_subscription(target_id, &subscription_type)
+    db.save_subscription(target_id, &subscription_type)
         .map_err(|_| Status::InternalServerError)?;
 
     Ok(())
