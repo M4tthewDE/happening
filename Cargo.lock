@@ -716,6 +716,7 @@ dependencies = [
  "anyhow",
  "diesel",
  "dotenvy",
+ "log 0.4.17",
  "rand",
  "redis",
  "reqwest",

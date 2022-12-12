@@ -3,7 +3,7 @@
 use std::{sync::Mutex, time::Duration};
 
 use db::{Db, RedisClient};
-use rocket::{http::Status, serde::json::Json, Build, Rocket, State};
+use rocket::{fairing::AdHoc, http::Status, serde::json::Json, Build, Config, Rocket, State};
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use tokio::{task, time};
 use twitch::TwitchApi;
@@ -22,11 +22,17 @@ struct ApiState {
     twitch_api: TwitchApi,
     redis_client: Mutex<RedisClient>,
     db: Db,
+    callback: String,
 }
 
 impl ApiState {
-    fn get_all(&self) -> (&TwitchApi, &Mutex<RedisClient>, &Db) {
-        (&self.twitch_api, &self.redis_client, &self.db)
+    fn get_all(&self) -> (&TwitchApi, &Mutex<RedisClient>, &Db, &String) {
+        (
+            &self.twitch_api,
+            &self.redis_client,
+            &self.db,
+            &self.callback,
+        )
     }
 }
 
@@ -74,14 +80,17 @@ async fn rocket() -> Rocket<Build> {
     });
 
     let db = Db::new().unwrap();
+    let callback: String = rocket::Config::figment().extract_inner("callback").unwrap();
 
     let api_state = ApiState {
         twitch_api,
         redis_client: Mutex::new(redis_client),
         db,
+        callback,
     };
 
     rocket
+        .attach(AdHoc::config::<Config>())
         .mount("/", routes![new_subscription])
         .manage(api_state)
 }
@@ -91,7 +100,7 @@ async fn new_subscription(
     subscription: Json<Subscription<'_>>,
     api_state: &State<ApiState>,
 ) -> Result<(), Status> {
-    let (twitch_api, redis_client, db) = api_state.get_all();
+    let (twitch_api, redis_client, db, callback) = api_state.get_all();
 
     let target_id = &subscription.target_id;
     let token = redis_client
@@ -101,13 +110,25 @@ async fn new_subscription(
         .map_err(|_| Status::InternalServerError)?;
 
     let is_valid = twitch_api
-        .is_valid_user_id(token, target_id)
+        .is_valid_user_id(token.clone(), target_id)
         .await
         .map_err(|_| Status::InternalServerError)?;
 
     if !is_valid {
         return Err(Status::BadRequest);
     }
+
+    // register at twitch
+    // TODO save response (id for verification) in db
+    twitch_api
+        .create_eventsub(
+            token,
+            subscription.subscription_type.get_twitch_type(),
+            target_id.to_string(),
+            callback.to_string(),
+        )
+        .await
+        .map_err(|_| Status::InternalServerError)?;
 
     let subscription_type = subscription.subscription_type.to_string();
     db.save_subscription(target_id, &subscription_type)

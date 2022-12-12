@@ -24,3 +24,12 @@ impl Display for SubscriptionType {
         }
     }
 }
+
+impl SubscriptionType {
+    pub fn get_twitch_type(&self) -> String {
+        match self {
+            SubscriptionType::Follow => "channel.follow".to_string(),
+            SubscriptionType::Sub => "channel.subscribe".to_string(),
+        }
+    }
+}

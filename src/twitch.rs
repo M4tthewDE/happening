@@ -85,6 +85,7 @@ impl TwitchApi {
 
     pub async fn create_eventsub(
         &self,
+        token: String,
         sub_type: String,
         user_id: String,
         callback: String,
@@ -93,27 +94,32 @@ impl TwitchApi {
             CreateEventsubBody::new(sub_type, user_id, callback, self.eventsub_secret.clone());
         let res = self
             .reqwest
-            .post("https://id.twitch.tv/oauth2/token")
-            .query(&[
-                ("client_id", &self.client_id),
-                ("client_secret", &self.secret),
-                ("grant_type", &"client_credentials".to_string()),
-            ])
+            .post("https://api.twitch.tv/helix/eventsub/subscriptions")
             .json(&body)
+            .header("Authorization", &format!("Bearer {token}"))
+            .header("Client-Id", &self.client_id)
             .send()
             .await
             .with_context(|| "token request failed")?;
 
-        if !res.status().is_success() {
-            bail!("error creating eventsub: {}", res.status());
+        let status = res.status();
+
+        if !status.is_success() {
+            error!(
+                "error creating eventsub: {} {}",
+                status,
+                res.text().await.unwrap()
+            );
+            bail!("error creating eventsub: {}", status);
         }
 
         Ok(())
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct CreateEventsubBody {
+    #[serde(rename(serialize = "type"))]
     sub_type: String,
     version: String,
     condition: CreateCondition,
@@ -123,14 +129,16 @@ struct CreateEventsubBody {
 impl CreateEventsubBody {
     fn new(
         sub_type: String,
-        user_id: String,
+        broadcaster_user_id: String,
         callback: String,
         secret: String,
     ) -> CreateEventsubBody {
         CreateEventsubBody {
             sub_type,
             version: "1".to_string(),
-            condition: CreateCondition { user_id },
+            condition: CreateCondition {
+                broadcaster_user_id,
+            },
             transport: CreateTransport {
                 method: "webhook".to_string(),
                 callback,
@@ -140,12 +148,12 @@ impl CreateEventsubBody {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct CreateCondition {
-    user_id: String,
+    broadcaster_user_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 struct CreateTransport {
     method: String,
     callback: String,
