@@ -1,14 +1,22 @@
 package main
 
 import (
-	"log"
+	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
 func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Printf("Processing Lambda request %t\n", request.RequestContext)
+	var newSubscriptionBody NewSubscriptionBody
+	err := json.Unmarshal([]byte(request.Body), &newSubscriptionBody)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			Body:       "Hello world",
+			StatusCode: 400,
+		}, err
+	}
+
 	return events.APIGatewayProxyResponse{
 		Body:       "Hello world",
 		StatusCode: 200,
@@ -16,6 +24,10 @@ func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 }
 
 func main() {
-	log.Printf("Start lambda")
 	lambda.Start(HandleRequest)
+}
+
+type NewSubscriptionBody struct {
+	TargetUserID string `json:"target_user_id"`
+	SubType      string `json:"sub_type"`
 }
