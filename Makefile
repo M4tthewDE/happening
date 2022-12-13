@@ -1,5 +1,5 @@
 build:
-	GOOS=linux GOARCH=amd64 go build -o ./bin/api ./backend/api/...
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ./bin/api ./backend/api/...
 
 init:
 	terraform init 
