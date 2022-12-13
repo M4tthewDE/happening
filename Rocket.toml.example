@@ -1,3 +1,0 @@
-[debug]
-cors_allow_all = true
-callback = "https://callback"
