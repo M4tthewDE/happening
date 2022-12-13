@@ -1,0 +1,18 @@
+# build output
+bin
+
+# env vars
+.env*
+!.env.example
+
+# terraform
+**/.terraform
+*.tfstate*
+*.tfvars
+
+# ignore CLI configuration files
+.terraformrc
+terraform.rc
+
+# terraform plans
+plans
