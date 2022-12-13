@@ -7,7 +7,7 @@ use rocket::{fairing::AdHoc, http::Status, serde::json::Json, Build, Config, Roc
 use rocket_cors::{AllowedOrigins, CorsOptions};
 use tokio::{task, time};
 use twitch::TwitchApi;
-use types::Subscription;
+use types::{EventsubNotification, Subscription};
 
 #[macro_use]
 extern crate rocket;
@@ -91,7 +91,7 @@ async fn rocket() -> Rocket<Build> {
 
     rocket
         .attach(AdHoc::config::<Config>())
-        .mount("/", routes![new_subscription])
+        .mount("/", routes![new_subscription, new_eventsub_notification])
         .manage(api_state)
 }
 
@@ -137,6 +137,27 @@ async fn new_subscription(
     Ok(())
 }
 
+#[post(
+    "/api/twitch/eventsub",
+    format = "json",
+    data = "<eventsub_notification>"
+)]
+async fn new_eventsub_notification(
+    eventsub_notification: Json<EventsubNotification>,
+    api_state: &State<ApiState>,
+) -> Result<String, Status> {
+    // naively accept every challenge request
+    info!("{eventsub_notification:?}");
+    match &eventsub_notification.challenge {
+        Some(challenge) => {
+            return Ok(challenge.to_string());
+        }
+        _ => {}
+    }
+
+    Ok("".to_string())
+}
+
 #[cfg(test)]
 mod test {
     use super::rocket;
@@ -147,6 +168,7 @@ mod test {
 
     #[rocket::async_test]
     async fn new_subscription_invalid_target() {
+        todo!("DELETE SUBS BEFORE STARTING TESTS");
         let rocket = rocket().await;
         let client = Client::tracked(rocket)
             .await

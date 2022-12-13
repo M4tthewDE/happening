@@ -3,14 +3,12 @@ use std::fmt::Display;
 use rocket::serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
 pub struct Subscription<'r> {
     pub target_id: &'r str,
     pub subscription_type: SubscriptionType,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(crate = "rocket::serde")]
 pub enum SubscriptionType {
     Follow,
     Sub,
@@ -32,4 +30,15 @@ impl SubscriptionType {
             SubscriptionType::Sub => "channel.subscribe".to_string(),
         }
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EventsubNotification {
+    pub challenge: Option<String>,
+    pub subscription: EventsubNotificationSubscription,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct EventsubNotificationSubscription {
+    pub id: String,
 }
