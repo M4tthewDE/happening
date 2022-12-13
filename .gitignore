@@ -5,3 +5,4 @@ src/ui/dist
 .env
 *.db
 
+Rocket.toml
