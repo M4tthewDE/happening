@@ -1,3 +1,5 @@
+
+# needs to be manually verified at cloudflare
 resource "aws_acm_certificate" "cert" {
   domain_name       = "happening.fdm.com.de"
   validation_method = "DNS"
