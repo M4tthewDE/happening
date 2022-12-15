@@ -56,3 +56,30 @@ resource "aws_lambda_permission" "lambda_permission" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_deployment.api_deployment.execution_arn}/*/*"
 }
+
+# needs to be manually verified at cloudflare
+resource "aws_acm_certificate" "cert" {
+  domain_name       = "happening.fdm.com.de"
+  validation_method = "DNS"
+
+  tags = {
+    Environment = "develop"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "happening" {
+  certificate_arn = aws_acm_certificate.cert.arn
+}
+
+resource "aws_api_gateway_domain_name" "happening" {
+  domain_name              = "happening.fdm.com.de"
+  regional_certificate_arn = aws_acm_certificate_validation.happening.certificate_arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
