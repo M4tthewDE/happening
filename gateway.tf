@@ -1,5 +1,9 @@
 resource "aws_api_gateway_rest_api" "api" {
   name = local.app_id
+  endpoint_configuration {
+
+    types = ["REGIONAL"]
+  }
 }
 
 resource "aws_api_gateway_resource" "proxy" {
@@ -95,7 +99,7 @@ resource "cloudflare_record" "happening" {
   zone_id = data.cloudflare_zone.zone.zone_id
   name    = "happening"
   type    = "CNAME"
-  value   = aws_api_gateway_domain_name.happening.cloudfront_domain_name
+  value   = aws_api_gateway_domain_name.happening.regional_domain_name
 
   proxied = true # Take advantage of Cloudflare http caching
 }
