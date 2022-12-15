@@ -1,18 +1,4 @@
 
-# needs to be manually verified at cloudflare
-resource "aws_acm_certificate" "cert" {
-  domain_name       = "happening.fdm.com.de"
-  validation_method = "DNS"
-
-  tags = {
-    Environment = "develop"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 data "cloudflare_zone" "zone" {
   name = "fdm.com.de"
 }
