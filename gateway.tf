@@ -58,6 +58,7 @@ resource "aws_lambda_permission" "lambda_permission" {
 }
 
 # needs to be manually verified at cloudflare
+// TODO: does this get destroyed?
 resource "aws_acm_certificate" "cert" {
   domain_name       = "happening.fdm.com.de"
   validation_method = "DNS"
@@ -71,6 +72,7 @@ resource "aws_acm_certificate" "cert" {
   }
 }
 
+// https://blog.viktoradam.net/2018/08/30/moving-home/
 resource "aws_acm_certificate_validation" "happening" {
   certificate_arn = aws_acm_certificate.cert.arn
 }
@@ -82,4 +84,18 @@ resource "aws_api_gateway_domain_name" "happening" {
   endpoint_configuration {
     types = ["REGIONAL"]
   }
+}
+
+
+data "cloudflare_zone" "zone" {
+  name = "fdm.com.de"
+}
+
+resource "cloudflare_record" "happening" {
+  zone_id = data.cloudflare_zone.zone.zone_id
+  name    = "happening"
+  type    = "CNAME"
+  value   = aws_api_gateway_domain_name.happening.cloudfront_domain_name
+
+  proxied = true # Take advantage of Cloudflare http caching
 }
