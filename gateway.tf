@@ -61,8 +61,6 @@ resource "aws_lambda_permission" "lambda_permission" {
   source_arn    = "${aws_api_gateway_deployment.api_deployment.execution_arn}/*/*"
 }
 
-# needs to be manually verified at cloudflare
-// TODO: does this get destroyed?
 resource "aws_acm_certificate" "cert" {
   domain_name       = "happening.fdm.com.de"
   validation_method = "DNS"
@@ -70,20 +68,16 @@ resource "aws_acm_certificate" "cert" {
   tags = {
     Environment = "develop"
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 // https://blog.viktoradam.net/2018/08/30/moving-home/
-resource "aws_acm_certificate_validation" "happening" {
+resource "aws_acm_certificate_validation" "cert" {
   certificate_arn = aws_acm_certificate.cert.arn
 }
 
 resource "aws_api_gateway_domain_name" "happening" {
   domain_name              = "happening.fdm.com.de"
-  regional_certificate_arn = aws_acm_certificate_validation.happening.certificate_arn
+  regional_certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
 
   endpoint_configuration {
     types = ["REGIONAL"]
@@ -93,6 +87,22 @@ resource "aws_api_gateway_domain_name" "happening" {
 
 data "cloudflare_zone" "zone" {
   name = "fdm.com.de"
+}
+
+resource "cloudflare_record" "verification" {
+  for_each = {
+    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+    }
+  }
+
+  zone_id = data.cloudflare_zone.zone.zone_id
+  name    = each.value.name
+  value   = each.value.record
+  type    = "CNAME"
+
+  proxied = false # Take advantage of Cloudflare http caching
 }
 
 resource "cloudflare_record" "happening" {
