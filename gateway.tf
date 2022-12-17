@@ -1,5 +1,7 @@
 resource "aws_api_gateway_rest_api" "api" {
-  name = local.app_id
+  name                         = local.app_id
+  disable_execute_api_endpoint = true
+
   endpoint_configuration {
 
     types = ["REGIONAL"]
@@ -61,6 +63,7 @@ resource "aws_lambda_permission" "lambda_permission" {
   source_arn    = "${aws_api_gateway_deployment.api_deployment.execution_arn}/*/*"
 }
 
+
 resource "aws_acm_certificate" "cert" {
   domain_name       = "happening.fdm.com.de"
   validation_method = "DNS"
@@ -84,6 +87,11 @@ resource "aws_api_gateway_domain_name" "happening" {
   }
 }
 
+resource "aws_api_gateway_base_path_mapping" "apigw_base_path_blog_demo" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_deployment.api_deployment.stage_name
+  domain_name = aws_api_gateway_domain_name.happening.domain_name
+}
 
 data "cloudflare_zone" "zone" {
   name = "fdm.com.de"
