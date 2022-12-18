@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/m4tthewde/happening/backend/internal"
+	"github.com/m4tthewde/happening/backend/api/internal"
 )
 
 func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {

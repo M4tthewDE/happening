@@ -1,6 +1,6 @@
 .PHONY: build 
 build:
-	GOOS=linux CGO_ENABLED=0 go build -o ./bin/api ./backend/cmd/deploy/...
+	GOOS=linux CGO_ENABLED=0 go build -o ./bin/api ./backend/api/cmd/...
 
 .PHONY: init 
 init:
@@ -17,7 +17,3 @@ apply:
 .PHONY: destroy
 destroy:
 	@./scripts/with-env.sh terraform destroy --auto-approve 
-
-.PHONY: run-backend
-run-backend:
-	go run backend/cmd/local/main.go
