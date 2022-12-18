@@ -1,6 +1,6 @@
 .PHONY: build 
 build:
-	GOOS=linux CGO_ENABLED=0 go build -o ./bin/api ./backend/api/...
+	GOOS=linux CGO_ENABLED=0 go build -o ./bin/api ./backend/cmd/deploy/...
 
 .PHONY: init 
 init:
@@ -20,4 +20,4 @@ destroy:
 
 .PHONY: run-backend
 run-backend:
-	sam local start-api -p 8080
+	go run backend/cmd/local/main.go
