@@ -1,6 +1,7 @@
 .PHONY: build 
 build:
 	GOOS=linux CGO_ENABLED=0 go build -o ./bin/api ./backend/api/cmd/...
+	GOOS=linux CGO_ENABLED=0 go build -o ./bin/auth ./backend/auth/cmd/...
 
 .PHONY: init 
 init:

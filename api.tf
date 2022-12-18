@@ -1,6 +1,6 @@
 variable "app_name" {
   description = "Application name"
-  default     = "api"
+  default     = "happening"
 }
 
 resource "random_id" "unique_suffix" {
@@ -57,7 +57,7 @@ data "archive_file" "lambda_zip" {
 
 resource "aws_lambda_function" "lambda_func" {
   filename         = data.archive_file.lambda_zip.output_path
-  function_name    = local.app_id
+  function_name    = "api-${local.app_id}"
   handler          = "api"
   source_code_hash = base64sha256(data.archive_file.lambda_zip.output_path)
   runtime          = "go1.x"
