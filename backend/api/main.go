@@ -12,6 +12,7 @@ func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	err := json.Unmarshal([]byte(request.Body), &newSubscriptionBody)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
+			Body:       "",
 			StatusCode: 400,
 		}, err
 	}

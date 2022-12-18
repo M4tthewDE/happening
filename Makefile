@@ -17,3 +17,7 @@ apply:
 .PHONY: destroy
 destroy:
 	@./scripts/with-env.sh terraform destroy --auto-approve 
+
+.PHONY: run-backend
+run-backend:
+	sam local start-api -p 8080

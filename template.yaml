@@ -4,10 +4,13 @@ Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: Prod
+      StageName: Local
       Cors:
+        AllowMethods: "'POST, GET'"
         AllowHeaders: "'*'"
-        AllowOrigin: "'http://localhost:3000'"
+        AllowOrigin: "'*'"
+        MaxAge: "'600'"
+        AllowCredentials: true
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
