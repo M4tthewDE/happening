@@ -1,16 +1,16 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: AWS SAM template with a simple API definition
+Transform: AWS::Serverless-2016-10-31
 Resources:
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
       StageName: Local
       Cors:
-        AllowMethods: "'POST, GET'"
+        AllowMethods: "'POST'"
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
         MaxAge: "'600'"
-        AllowCredentials: true
   ApiFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -24,4 +24,3 @@ Resources:
               Ref: ApiGatewayApi
       Handler: bin/api
       Runtime: go1.x
-Transform: AWS::Serverless-2016-10-31
