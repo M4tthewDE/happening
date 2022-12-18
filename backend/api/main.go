@@ -12,13 +12,19 @@ func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	err := json.Unmarshal([]byte(request.Body), &newSubscriptionBody)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
-			Body:       "Hello world",
+			StatusCode: 400,
+		}, err
+	}
+
+	resp, err := json.Marshal(newSubscriptionBody)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
 			StatusCode: 400,
 		}, err
 	}
 
 	return events.APIGatewayProxyResponse{
-		Body:       "Hello world",
+		Body:       string(resp),
 		StatusCode: 200,
 	}, nil
 }
@@ -28,6 +34,6 @@ func main() {
 }
 
 type NewSubscriptionBody struct {
-	TargetUserID string `json:"target_user_id"`
-	SubType      string `json:"sub_type"`
+	TargetUserID string `json:"target_id"`
+	SubType      string `json:"subscription_type"`
 }
