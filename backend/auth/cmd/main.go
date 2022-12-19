@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -10,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
+	"github.com/nicklaw5/helix"
 )
 
 const (
@@ -37,7 +39,7 @@ func (d DB) GetAuth(ctx context.Context) (string, bool, error) {
 		return "", false, nil
 	}
 
-	return "", false, nil
+	return "", len(out.Items) != 0, nil
 }
 
 func (d DB) SaveAuth(ctx context.Context, token string) error {
@@ -70,13 +72,35 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	}
 
 	if !exists {
-		err = d.SaveAuth(ctx, "test")
+		token, err := GenerateToken()
+		if err != nil {
+			return err
+		}
+
+		err = d.SaveAuth(ctx, token)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func GenerateToken() (string, error) {
+	client, err := helix.NewClient(&helix.Options{
+		ClientID:     os.Getenv("TWITCH_CLIENT_ID"),
+		ClientSecret: os.Getenv("TWITCH_SECRET"),
+	})
+	if err != nil {
+		return "", nil
+	}
+
+	resp, err := client.RequestAppAccessToken([]string{""})
+	if err != nil {
+		return "", nil
+	}
+
+	return resp.Data.AccessToken, nil
 }
 
 func main() {
