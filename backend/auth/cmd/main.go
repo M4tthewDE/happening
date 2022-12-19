@@ -39,7 +39,8 @@ func (d DB) GetAuth(ctx context.Context) (string, bool, error) {
 		return "", false, nil
 	}
 
-	return "", len(out.Items) != 0, nil
+	token := out.Items[0]["access_token"].(*types.AttributeValueMemberS).Value
+	return token, true, nil
 }
 
 func (d DB) SaveAuth(ctx context.Context, token string) error {
@@ -52,6 +53,23 @@ func (d DB) SaveAuth(ctx context.Context, token string) error {
 	})
 
 	return nil
+}
+
+func GenerateToken() (*helix.AccessCredentials, error) {
+	client, err := helix.NewClient(&helix.Options{
+		ClientID:     os.Getenv("TWITCH_CLIENT_ID"),
+		ClientSecret: os.Getenv("TWITCH_SECRET"),
+	})
+	if err != nil {
+		return nil, nil
+	}
+
+	resp, err := client.RequestAppAccessToken([]string{""})
+	if err != nil {
+		return nil, nil
+	}
+
+	return &resp.Data, nil
 }
 
 func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
@@ -77,30 +95,13 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 			return err
 		}
 
-		err = d.SaveAuth(ctx, token)
+		err = d.SaveAuth(ctx, token.AccessToken)
 		if err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-func GenerateToken() (string, error) {
-	client, err := helix.NewClient(&helix.Options{
-		ClientID:     os.Getenv("TWITCH_CLIENT_ID"),
-		ClientSecret: os.Getenv("TWITCH_SECRET"),
-	})
-	if err != nil {
-		return "", nil
-	}
-
-	resp, err := client.RequestAppAccessToken([]string{""})
-	if err != nil {
-		return "", nil
-	}
-
-	return resp.Data.AccessToken, nil
 }
 
 func main() {

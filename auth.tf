@@ -33,7 +33,7 @@ resource "aws_lambda_function" "auth_lambda" {
 resource "aws_cloudwatch_event_rule" "auth" {
   name                = "auth-event"
   description         = "Refresh twitch auth token stored in dynamodb"
-  schedule_expression = "rate(5 minutes)"
+  schedule_expression = "rate(1 minute)"
 }
 
 
