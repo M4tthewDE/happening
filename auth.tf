@@ -12,3 +12,24 @@ resource "aws_lambda_function" "auth_lambda" {
   runtime          = "go1.x"
   role             = aws_iam_role.lambda_exec.arn
 }
+
+resource "aws_cloudwatch_event_rule" "auth" {
+  name                = "auth-event"
+  description         = "Refresh twitch auth token stored in dynamodb"
+  schedule_expression = "rate(5 minutes)"
+}
+
+
+resource "aws_cloudwatch_event_target" "auth_lambda" {
+  rule      = aws_cloudwatch_event_rule.auth.name
+  target_id = "auth-lambda"
+  arn       = aws_lambda_function.auth_lambda.arn
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_auth_lambda" {
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.auth_lambda.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.auth.arn
+}
