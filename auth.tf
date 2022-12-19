@@ -1,3 +1,13 @@
+variable "TWITCH_SECRET" {
+  type      = string
+  sensitive = true
+}
+
+variable "TWITCH_CLIENT_ID" {
+  type      = string
+  sensitive = true
+}
+
 data "archive_file" "auth_zip" {
   type        = "zip"
   source_file = "bin/auth"
@@ -11,6 +21,13 @@ resource "aws_lambda_function" "auth_lambda" {
   source_code_hash = base64sha256(data.archive_file.auth_zip.output_path)
   runtime          = "go1.x"
   role             = aws_iam_role.lambda_exec.arn
+
+  environment {
+    variables = {
+      TWITCH_SECRET    = var.TWITCH_SECRET
+      TWITCH_CLIENT_ID = var.TWITCH_CLIENT_ID
+    }
+  }
 }
 
 resource "aws_cloudwatch_event_rule" "auth" {
