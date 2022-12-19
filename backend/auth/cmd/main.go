@@ -72,6 +72,25 @@ func GenerateToken() (*helix.AccessCredentials, error) {
 	return &resp.Data, nil
 }
 
+func ShouldRefresh(token string) (bool, error) {
+	client, err := helix.NewClient(&helix.Options{
+		ClientID: os.Getenv("TWITCH_CLIENT_ID"),
+	})
+	if err != nil {
+		return false, err
+	}
+
+	isValid, _, err := client.ValidateToken(token)
+	if err != nil {
+		return false, err
+	}
+
+	// should never happen, means token has already expired
+	// should regenerate new one if it's expiring soon (to account for lambda schedule)
+	// TODO: nicklaw5/helix does not provide that information, call helix manually
+	return !isValid, nil
+}
+
 func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
@@ -84,7 +103,7 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	client := dynamodb.NewFromConfig(cfg)
 	d := NewDao(client)
 
-	_, exists, err := d.GetAuth(ctx)
+	token, exists, err := d.GetAuth(ctx)
 	if err != nil {
 		return err
 	}
@@ -99,6 +118,21 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	shouldRefresh, err := ShouldRefresh(token)
+	if err != nil {
+		return err
+	}
+
+	if shouldRefresh {
+		token, err := GenerateToken()
+		if err != nil {
+			return err
+		}
+
+		// TODO: save token, ensure only one exists in db
+		// (implement either in SaveAuth() or here)
 	}
 
 	return nil
