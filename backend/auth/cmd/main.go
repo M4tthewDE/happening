@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -11,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
-	"github.com/nicklaw5/helix"
+	"github.com/nicklaw5/helix/v2"
 )
 
 const (
@@ -80,15 +81,14 @@ func ShouldRefresh(token string) (bool, error) {
 		return false, err
 	}
 
-	isValid, _, err := client.ValidateToken(token)
+	_, resp, err := client.ValidateToken(token)
 	if err != nil {
 		return false, err
 	}
 
-	// should never happen, means token has already expired
-	// should regenerate new one if it's expiring soon (to account for lambda schedule)
-	// TODO: nicklaw5/helix does not provide that information, call helix manually
-	return !isValid, nil
+	log.Println(resp.Data.ExpiresIn)
+
+	return resp.Data.ExpiresIn < 660, nil
 }
 
 func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
@@ -126,10 +126,12 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	}
 
 	if shouldRefresh {
-		token, err := GenerateToken()
+		_, err := GenerateToken()
 		if err != nil {
 			return err
 		}
+
+		log.Println("Should refresh now")
 
 		// TODO: save token, ensure only one exists in db
 		// (implement either in SaveAuth() or here)
