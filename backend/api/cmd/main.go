@@ -1,25 +1,39 @@
 package main
 
 import (
+	"log"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/m4tthewde/happening/backend/api/internal"
 )
 
-func HandleRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	response, status := internal.HandleNewSubscription(request.Body)
-
-	return events.APIGatewayProxyResponse{
-		Body:       response,
-		StatusCode: status,
-	}, nil
-}
-
 func main() {
-	lambda.Start(HandleRequest)
+	lambda.Start(distributeRequest)
 }
 
-type NewSubscriptionBody struct {
-	TargetUserID string `json:"target_id"`
-	SubType      string `json:"subscription_type"`
+func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+	log.Println(request.Path)
+
+	switch request.Path {
+	case "/api/subscription":
+		return subscriptionRequest(request), nil
+	default:
+		return events.APIGatewayProxyResponse{
+			Body:       "",
+			StatusCode: 404,
+		}, nil
+	}
+}
+
+func subscriptionRequest(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	switch request.HTTPMethod {
+	case "POST":
+		return internal.HandleNewSubscription(request)
+	default:
+		return events.APIGatewayProxyResponse{
+			Body:       "",
+			StatusCode: 405,
+		}
+	}
 }

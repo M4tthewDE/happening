@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function handleSubmit(event: any) {
     console.log(event);
-    axios.post('http://localhost:8080/api', event)
+    axios.post('http://localhost:8080/api/subscription', event)
         .then(res => {
             console.log(res);
         })
