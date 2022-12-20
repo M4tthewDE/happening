@@ -40,8 +40,8 @@ function SubscriptionList() {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Type</th>
                         <th>Target</th>
+                        <th>Type</th>
                         <th>Status</th>
                     </tr>
                 </thead>
