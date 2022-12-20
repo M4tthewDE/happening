@@ -1,5 +1,5 @@
+import SubscriptionAddForm from './components/SubscriptionAddForm';
 import SubscriptionDeleteForm from './components/SubscriptionDeleteForm';
-import SubscriptionForm from './components/SubscriptionForm';
 import SubscriptionList from './components/SubscriptionList';
 
 export default function App() {
@@ -9,7 +9,7 @@ export default function App() {
       <br />
       <SubscriptionDeleteForm></SubscriptionDeleteForm>
       <br />
-      <SubscriptionForm></SubscriptionForm>
+      <SubscriptionAddForm></SubscriptionAddForm>
       <br />
       <SubscriptionList></SubscriptionList>
     </div>

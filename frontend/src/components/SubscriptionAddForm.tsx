@@ -10,7 +10,7 @@ function handleSubmit(event: any) {
         })
 }
 
-function SubscriptionForm() {
+function SubscriptionAddForm() {
     const form = useForm(
         {
             initialValues: {
@@ -50,4 +50,4 @@ function SubscriptionForm() {
     );
 }
 
-export default SubscriptionForm;
+export default SubscriptionAddForm;
