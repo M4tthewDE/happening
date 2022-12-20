@@ -13,6 +13,44 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
+func DeleteSubscription(request events.APIGatewayProxyRequest) (string, int) {
+	ctx := context.TODO()
+	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
+		o.Region = "us-east-1"
+		return nil
+	})
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	dbClient := dynamodb.NewFromConfig(cfg)
+	d := NewDao(dbClient)
+
+	token, err := d.GetAuth(ctx)
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	client, err := helix.NewClient(&helix.Options{
+		ClientID:       os.Getenv("TWITCH_CLIENT_ID"),
+		AppAccessToken: token,
+	})
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	id := request.QueryStringParameters["id"]
+	_, err = client.RemoveEventSubSubscription(id)
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+	return "", 200
+}
+
 type GetSubscriptionBody struct {
 	Subscriptions []GetSubscription `json:"subscriptions"`
 }

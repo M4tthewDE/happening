@@ -18,10 +18,10 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 	var body string
 	var status int
 
-	switch request.Path {
-	case "/api/subscription":
+	switch request.PathParameters["proxy"] {
+	case "api/subscription":
 		body, status = subscriptionRequest(request)
-	case "/api/twitch":
+	case "api/twitch":
 		body, status = twitchRequest(request)
 	default:
 		body = ""
@@ -30,6 +30,7 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 
 	headers := make(map[string]string, 0)
 	headers["Access-Control-Allow-Origin"] = "*"
+	headers["Access-Control-Allow-Methods"] = "GET, POST, DELETE"
 	headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
 
 	return events.APIGatewayProxyResponse{
@@ -45,6 +46,8 @@ func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 		return internal.HandleNewSubscription(request)
 	case "GET":
 		return internal.GetSubscriptions(request)
+	case "DELETE":
+		return internal.DeleteSubscription(request)
 	case "OPTIONS":
 		return "", 200
 	default:
