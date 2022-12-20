@@ -9,6 +9,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+
 	lambda.Start(distributeRequest)
 }
 

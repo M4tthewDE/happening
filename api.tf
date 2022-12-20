@@ -86,7 +86,8 @@ resource "aws_lambda_function" "lambda_func" {
 
   environment {
     variables = {
-      EVENTSUB_SECRET = random_password.eventsub_secret.result
+      EVENTSUB_SECRET  = random_password.eventsub_secret.result
+      TWITCH_CLIENT_ID = var.TWITCH_CLIENT_ID
     }
   }
 }
