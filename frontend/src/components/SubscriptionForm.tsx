@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function handleSubmit(event: any) {
     console.log(event);
-    axios.post('http://localhost:8080/api/subscription', event)
+    axios.post('https://happening.fdm.com.de/api/subscription', event)
         .then(res => {
             console.log(res);
         })
@@ -35,8 +35,8 @@ function SubscriptionForm() {
                     label="Type"
                     placeholder="Pick one"
                     data={[
-                        { value: 'Follow', label: 'Follow' },
-                        { value: 'Sub', label: 'Subscription' },
+                        { value: 'FOLLOW', label: 'Follow' },
+                        { value: 'SUB', label: 'Subscription' },
                     ]}
                     {...form.getInputProps('subscription_type')}
                 />

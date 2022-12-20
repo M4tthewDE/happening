@@ -13,15 +13,80 @@ import (
 	"github.com/nicklaw5/helix"
 )
 
-func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+type GetSubscriptionBody struct {
+	Subscriptions []GetSubscription `json:"subscriptions"`
+}
+
+type GetSubscription struct {
+	TargetUserID string `json:"target_id"`
+	SubType      string `json:"subscription_type"`
+	Status       string `json:"status"`
+}
+
+func GetSubscriptions(request events.APIGatewayProxyRequest) (string, int) {
+	ctx := context.TODO()
+	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
+		o.Region = "us-east-1"
+		return nil
+	})
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	dbClient := dynamodb.NewFromConfig(cfg)
+	d := NewDao(dbClient)
+
+	token, err := d.GetAuth(ctx)
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	client, err := helix.NewClient(&helix.Options{
+		ClientID:       os.Getenv("TWITCH_CLIENT_ID"),
+		AppAccessToken: token,
+	})
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	resp, err := client.GetEventSubSubscriptions(&helix.EventSubSubscriptionsParams{})
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	subscriptions := make([]GetSubscription, 0)
+	for _, sub := range resp.Data.EventSubSubscriptions {
+		subscriptions = append(subscriptions, GetSubscription{
+			TargetUserID: sub.Condition.BroadcasterUserID,
+			SubType:      sub.Type,
+			Status:       sub.Status,
+		})
+	}
+
+	body := GetSubscriptionBody{
+		Subscriptions: subscriptions,
+	}
+
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		log.Println(err)
+		return "", 500
+	}
+
+	return string(bodyBytes), 200
+}
+
+func HandleNewSubscription(request events.APIGatewayProxyRequest) (string, int) {
 	var newSubscriptionBody NewSubscriptionBody
 	err := json.Unmarshal([]byte(request.Body), &newSubscriptionBody)
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 400,
-		}
+		return "", 400
+
 	}
 
 	ctx := context.TODO()
@@ -31,10 +96,7 @@ func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGate
 	})
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 500,
-		}
+		return "", 500
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
@@ -43,10 +105,7 @@ func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGate
 	token, err := d.GetAuth(ctx)
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 500,
-		}
+		return "", 500
 	}
 
 	client, err := helix.NewClient(&helix.Options{
@@ -55,19 +114,13 @@ func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGate
 	})
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 500,
-		}
+		return "", 500
 	}
 
 	sub_type, err := newSubscriptionBody.getTypeString()
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 400,
-		}
+		return "", 500
 	}
 
 	_, err = client.CreateEventSubSubscription(&helix.EventSubSubscription{
@@ -84,16 +137,10 @@ func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGate
 	})
 	if err != nil {
 		log.Println(err)
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 500,
-		}
+		return "", 500
 	}
 
-	return events.APIGatewayProxyResponse{
-		Body:       "",
-		StatusCode: 200,
-	}
+	return "", 200
 }
 
 type NewSubscriptionBody struct {

@@ -14,29 +14,21 @@ import (
 	"github.com/nicklaw5/helix/v2"
 )
 
-func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) (string, int) {
 	if !VerifyEventSubNotification(os.Getenv("EVENTSUB_SECRET"), request.Headers, request.Body) {
 		log.Println("Failed to verify signature")
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 403,
-		}
+		return "", 403
 	}
 
 	var vals eventSubNotification
 	err := json.NewDecoder(bytes.NewReader([]byte(request.Body))).Decode(&vals)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 400,
-		}
+		log.Println(err)
+		return "", 400
 	}
 
 	if vals.Challenge != "" {
-		return events.APIGatewayProxyResponse{
-			Body:       vals.Challenge,
-			StatusCode: 200,
-		}
+		return vals.Challenge, 400
 	}
 
 	// TODO: hit helix and check if we want to handle this event
@@ -46,10 +38,7 @@ func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGat
 	case "channel.follow":
 		return handleFollowEvent(request)
 	default:
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 404,
-		}
+		return "", 404
 	}
 }
 
@@ -67,21 +56,15 @@ type eventSubNotification struct {
 	Event        json.RawMessage            `json:"event"`
 }
 
-func handleFollowEvent(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+func handleFollowEvent(request events.APIGatewayProxyRequest) (string, int) {
 	var followEvent helix.EventSubChannelFollowEvent
 	err := json.NewDecoder(bytes.NewReader([]byte(request.Body))).Decode(&followEvent)
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 400,
-		}
+		return "", 400
 	}
 
 	// TODO: empty struct
 	log.Println(followEvent)
 
-	return events.APIGatewayProxyResponse{
-		Body:       "",
-		StatusCode: 200,
-	}
+	return "", 200
 }

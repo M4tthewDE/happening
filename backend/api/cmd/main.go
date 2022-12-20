@@ -15,41 +15,48 @@ func main() {
 }
 
 func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	log.Println(request.Path)
+	var body string
+	var status int
 
 	switch request.Path {
 	case "/api/subscription":
-		return subscriptionRequest(request), nil
+		body, status = subscriptionRequest(request)
 	case "/api/twitch":
-		return twitchRequest(request), nil
+		body, status = twitchRequest(request)
 	default:
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 404,
-		}, nil
+		body = ""
+		status = 404
 	}
+
+	headers := make(map[string]string, 0)
+	headers["Access-Control-Allow-Origin"] = "*"
+	headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept"
+
+	return events.APIGatewayProxyResponse{
+		Body:       body,
+		StatusCode: status,
+		Headers:    headers,
+	}, nil
 }
 
-func subscriptionRequest(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "POST":
 		return internal.HandleNewSubscription(request)
+	case "GET":
+		return internal.GetSubscriptions(request)
+	case "OPTIONS":
+		return "", 200
 	default:
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 405,
-		}
+		return "", 405
 	}
 }
 
-func twitchRequest(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+func twitchRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "POST":
 		return internal.HandleNewEventsubEvent(request)
 	default:
-		return events.APIGatewayProxyResponse{
-			Body:       "",
-			StatusCode: 405,
-		}
+		return "", 405
 	}
 }
