@@ -28,20 +28,32 @@ func NewDao(ddb *dynamodb.Client) *DB {
 	return &DB{ddb: ddb}
 }
 
-func (d DB) GetAuth(ctx context.Context) (string, bool, error) {
+func (d DB) DeleteAuth(ctx context.Context, id string) error {
+	_, err := d.ddb.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+		TableName: aws.String(table_name),
+		Key: map[string]types.AttributeValue{
+			hash_key: &types.AttributeValueMemberS{Value: id},
+		},
+	})
+
+	return err
+}
+
+func (d DB) GetAuth(ctx context.Context) (string, string, bool, error) {
 	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
 		TableName: aws.String(table_name),
 	})
 	if err != nil {
-		return "", false, err
+		return "", "", false, err
 	}
 
 	if len(out.Items) == 0 {
-		return "", false, nil
+		return "", "", false, nil
 	}
 
 	token := out.Items[0]["access_token"].(*types.AttributeValueMemberS).Value
-	return token, true, nil
+	id := out.Items[0]["id"].(*types.AttributeValueMemberS).Value
+	return token, id, true, nil
 }
 
 func (d DB) SaveAuth(ctx context.Context, token string) error {
@@ -86,8 +98,6 @@ func ShouldRefresh(token string) (bool, error) {
 		return false, err
 	}
 
-	log.Println(resp.Data.ExpiresIn)
-
 	return resp.Data.ExpiresIn < 660, nil
 }
 
@@ -103,7 +113,7 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	client := dynamodb.NewFromConfig(cfg)
 	d := NewDao(client)
 
-	token, exists, err := d.GetAuth(ctx)
+	token, id, exists, err := d.GetAuth(ctx)
 	if err != nil {
 		return err
 	}
@@ -118,6 +128,8 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 		if err != nil {
 			return err
 		}
+
+		return nil
 	}
 
 	shouldRefresh, err := ShouldRefresh(token)
@@ -126,15 +138,22 @@ func HandleRequest(ctx context.Context, event events.CloudWatchEvent) error {
 	}
 
 	if shouldRefresh {
-		_, err := GenerateToken()
+		token, err := GenerateToken()
 		if err != nil {
 			return err
 		}
 
-		log.Println("Should refresh now")
+		log.Println("Refreshing token...")
 
-		// TODO: save token, ensure only one exists in db
-		// (implement either in SaveAuth() or here)
+		err = d.DeleteAuth(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		err = d.SaveAuth(ctx, token.AccessToken)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
