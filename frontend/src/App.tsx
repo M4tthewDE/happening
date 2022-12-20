@@ -5,7 +5,9 @@ export default function App() {
 
   return (
     <div>
+      <br />
       <SubscriptionForm></SubscriptionForm>
+      <br />
       <SubscriptionList></SubscriptionList>
     </div>
   );
