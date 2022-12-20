@@ -18,6 +18,8 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 	switch request.Path {
 	case "/api/subscription":
 		return subscriptionRequest(request), nil
+	case "/api/twtich":
+		return twitchRequest(request), nil
 	default:
 		return events.APIGatewayProxyResponse{
 			Body:       "",
@@ -30,6 +32,18 @@ func subscriptionRequest(request events.APIGatewayProxyRequest) events.APIGatewa
 	switch request.HTTPMethod {
 	case "POST":
 		return internal.HandleNewSubscription(request)
+	default:
+		return events.APIGatewayProxyResponse{
+			Body:       "",
+			StatusCode: 405,
+		}
+	}
+}
+
+func twitchRequest(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	switch request.HTTPMethod {
+	case "POST":
+		return internal.HandleNewEventsubEvent(request)
 	default:
 		return events.APIGatewayProxyResponse{
 			Body:       "",

@@ -11,6 +11,11 @@ locals {
   app_id = "${lower(var.app_name)}-${lower(var.app_env)}-${random_id.unique_suffix.hex}"
 }
 
+resource "random_password" "eventsub_secret" {
+  length  = 32
+  special = false
+}
+
 # Assume role setup
 resource "aws_iam_role" "lambda_exec" {
   name_prefix = local.app_id
@@ -79,4 +84,9 @@ resource "aws_lambda_function" "lambda_func" {
   runtime          = "go1.x"
   role             = aws_iam_role.lambda_exec.arn
 
+  environment {
+    variables = {
+      EVENTSUB_SECRET = random_password.eventsub_secret.result
+    }
+  }
 }
