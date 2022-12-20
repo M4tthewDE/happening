@@ -40,6 +40,10 @@ func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGat
 			StatusCode: 200,
 		}
 	}
+
+	// TODO: hit helix and check if we want to handle this event
+	// compare IDs
+
 	switch request.Path {
 	case "/api/twitch/follow":
 		return handleFollowEvent(request)
