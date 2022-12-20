@@ -78,7 +78,7 @@ func HandleNewSubscription(request events.APIGatewayProxyRequest) events.APIGate
 		},
 		Transport: helix.EventSubTransport{
 			Method:   "webhook",
-			Callback: "https://happening.fdm.com/api/twitch",
+			Callback: "https://happening.fdm.com.de/api/twitch",
 			Secret:   os.Getenv("EVENTSUB_SECRET"),
 		},
 	})

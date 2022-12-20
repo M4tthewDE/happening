@@ -20,7 +20,7 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 	switch request.Path {
 	case "/api/subscription":
 		return subscriptionRequest(request), nil
-	case "/api/twtich":
+	case "/api/twitch":
 		return twitchRequest(request), nil
 	default:
 		return events.APIGatewayProxyResponse{

@@ -2,7 +2,11 @@ package internal
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -11,14 +15,8 @@ import (
 )
 
 func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	headers := make(map[string][]string)
-	for key, value := range request.Headers {
-		v := make([]string, 1)
-		v = append(v, value)
-		headers[key] = v
-	}
-
-	if !helix.VerifyEventSubNotification(os.Getenv("EVENTSUB_SECRET"), headers, request.Body) {
+	if !VerifyEventSubNotification(os.Getenv("EVENTSUB_SECRET"), request.Headers, request.Body) {
+		log.Println("Failed to verify signature")
 		return events.APIGatewayProxyResponse{
 			Body:       "",
 			StatusCode: 403,
@@ -44,8 +42,8 @@ func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGat
 	// TODO: hit helix and check if we want to handle this event
 	// compare IDs
 
-	switch request.Path {
-	case "/api/twitch/follow":
+	switch vals.Subscription.Type {
+	case "channel.follow":
 		return handleFollowEvent(request)
 	default:
 		return events.APIGatewayProxyResponse{
@@ -53,6 +51,14 @@ func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) events.APIGat
 			StatusCode: 404,
 		}
 	}
+}
+
+func VerifyEventSubNotification(secret string, headers map[string]string, message string) bool {
+	hmacMessage := []byte(fmt.Sprintf("%s%s%s", headers["twitch-eventsub-message-id"], headers["twitch-eventsub-message-timestamp"], message))
+	mac := hmac.New(sha256.New, []byte(secret))
+	mac.Write(hmacMessage)
+	hmacsha256 := fmt.Sprintf("sha256=%s", hex.EncodeToString(mac.Sum(nil)))
+	return hmacsha256 == headers["twitch-eventsub-message-signature"]
 }
 
 type eventSubNotification struct {
@@ -71,6 +77,7 @@ func handleFollowEvent(request events.APIGatewayProxyRequest) events.APIGatewayP
 		}
 	}
 
+	// TODO: empty struct
 	log.Println(followEvent)
 
 	return events.APIGatewayProxyResponse{
