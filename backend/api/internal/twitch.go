@@ -28,7 +28,7 @@ func HandleNewEventsubEvent(request events.APIGatewayProxyRequest) (string, int)
 	}
 
 	if vals.Challenge != "" {
-		return vals.Challenge, 400
+		return vals.Challenge, 200
 	}
 
 	// TODO: hit helix and check if we want to handle this event
