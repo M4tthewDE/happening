@@ -43,7 +43,7 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "POST":
-		return internal.HandleNewSubscription(request)
+		return internal.PostSubscription(request)
 	case "GET":
 		return internal.GetSubscriptions(request)
 	case "DELETE":

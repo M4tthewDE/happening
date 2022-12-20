@@ -120,7 +120,7 @@ func GetSubscriptions(request events.APIGatewayProxyRequest) (string, int) {
 	return string(bodyBytes), 200
 }
 
-func HandleNewSubscription(request events.APIGatewayProxyRequest) (string, int) {
+func PostSubscription(request events.APIGatewayProxyRequest) (string, int) {
 	var newSubscriptionBody NewSubscriptionBody
 	err := json.Unmarshal([]byte(request.Body), &newSubscriptionBody)
 	if err != nil {
