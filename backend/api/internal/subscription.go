@@ -18,6 +18,7 @@ type GetSubscriptionBody struct {
 }
 
 type GetSubscription struct {
+	ID           string `json:"id"`
 	TargetUserID string `json:"target_id"`
 	SubType      string `json:"subscription_type"`
 	Status       string `json:"status"`
@@ -61,6 +62,7 @@ func GetSubscriptions(request events.APIGatewayProxyRequest) (string, int) {
 	subscriptions := make([]GetSubscription, 0)
 	for _, sub := range resp.Data.EventSubSubscriptions {
 		subscriptions = append(subscriptions, GetSubscription{
+			ID:           sub.ID,
 			TargetUserID: sub.Condition.BroadcasterUserID,
 			SubType:      sub.Type,
 			Status:       sub.Status,
