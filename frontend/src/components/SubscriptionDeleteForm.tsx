@@ -9,7 +9,11 @@ function handleSubmit(event: any) {
         })
 }
 
-function SubscriptionDeleteForm() {
+interface SubscriptionDeleteFormProps {
+    onSubmit: (event: any) => void;
+}
+
+function SubscriptionDeleteForm({ onSubmit }: SubscriptionDeleteFormProps) {
     const form = useForm(
         {
             initialValues: {
@@ -21,7 +25,7 @@ function SubscriptionDeleteForm() {
     return (
         <Box sx={{ maxWidth: 300 }} mx="auto">
             <Text fw={700}>Delete Subscription</Text>
-            <form onSubmit={form.onSubmit(handleSubmit)}>
+            <form onSubmit={form.onSubmit(onSubmit)}>
                 <TextInput
                     withAsterisk
                     label="ID"
