@@ -3,10 +3,10 @@ import { useForm } from '@mantine/form';
 
 
 interface SubscriptionDeleteFormProps {
-    onSubmit: (event: any) => void;
+    parentSubmit: (event: any) => void;
 }
 
-function SubscriptionDeleteForm({ onSubmit }: SubscriptionDeleteFormProps) {
+function SubscriptionDeleteForm({ parentSubmit }: SubscriptionDeleteFormProps) {
     const form = useForm(
         {
             initialValues: {
@@ -14,6 +14,10 @@ function SubscriptionDeleteForm({ onSubmit }: SubscriptionDeleteFormProps) {
             },
         }
     );
+    function onSubmit(event: any) {
+        form.reset()
+        parentSubmit(event);
+    }
 
     return (
         <Box sx={{ maxWidth: 300 }} mx="auto">
