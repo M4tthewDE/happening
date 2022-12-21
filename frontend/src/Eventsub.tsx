@@ -63,7 +63,7 @@ function Eventsub() {
     return (
         <div>
             <SubscriptionDeleteForm onSubmit={onDeleteSub}></SubscriptionDeleteForm>
-            <SubscriptionAddForm onSubmit={onAddSub}></SubscriptionAddForm>
+            <SubscriptionAddForm parentSubmit={onAddSub}></SubscriptionAddForm>
             <SubscriptionList rows={rows}></SubscriptionList>
         </div>
     );

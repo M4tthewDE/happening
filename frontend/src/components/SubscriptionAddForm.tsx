@@ -3,10 +3,10 @@ import { useForm } from '@mantine/form';
 
 
 interface SubscriptionAddFormProps {
-    onSubmit: (event: any) => void;
+    parentSubmit: (event: any) => void;
 }
 
-function SubscriptionAddForm({ onSubmit }: SubscriptionAddFormProps) {
+function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
     const form = useForm(
         {
             initialValues: {
@@ -15,6 +15,12 @@ function SubscriptionAddForm({ onSubmit }: SubscriptionAddFormProps) {
             },
         }
     );
+
+    function onSubmit(event: any) {
+        form.reset()
+        parentSubmit(event);
+    }
+
 
     return (
         <Box sx={{ maxWidth: 300 }} mx="auto">
