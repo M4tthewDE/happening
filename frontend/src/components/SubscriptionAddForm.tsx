@@ -27,7 +27,6 @@ function SubscriptionAddForm() {
                 <TextInput
                     withAsterisk
                     label="Target ID"
-                    placeholder="1234"
                     {...form.getInputProps('target_id')}
                 />
 

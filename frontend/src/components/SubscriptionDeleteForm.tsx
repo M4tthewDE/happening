@@ -25,7 +25,6 @@ function SubscriptionDeleteForm() {
                 <TextInput
                     withAsterisk
                     label="ID"
-                    placeholder="55e30e6f-d3f3-4222-91e8-63eb07bc9e9d"
                     {...form.getInputProps('id')}
                 />
                 <Group position="right" mt="md">
