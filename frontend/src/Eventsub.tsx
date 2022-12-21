@@ -41,6 +41,10 @@ function Eventsub() {
     }
 
     useEffect(() => {
+        reloadSubs()
+    }, [])
+
+    useEffect(() => {
         const rows = subscriptions.map((sub) => (
             <tr key={sub.id}>
                 <td>{sub.id}</td>
