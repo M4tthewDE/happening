@@ -1,38 +1,10 @@
 import { Box, Table } from "@mantine/core";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-interface SubscriptionIfc {
-    id: string;
-    target_id: string;
-    subscription_type: string;
-    status: string;
+interface SubscriptionListProps {
+    rows: any;
 }
 
-function SubscriptionList() {
-    const [subscriptions, setSubscriptions] = useState<SubscriptionIfc[]>([])
-    const [rows, setRows] = useState<any>([])
-
-    useEffect(() => {
-        axios.get('https://happening.fdm.com.de/api/subscription').then(res => {
-            const subscriptions = res.data.subscriptions
-            setSubscriptions(subscriptions)
-        })
-    }, []);
-
-    useEffect(() => {
-        const rows = subscriptions.map((sub) => (
-            <tr key={sub.id}>
-                <td>{sub.id}</td>
-                <td>{sub.target_id}</td>
-                <td>{sub.subscription_type}</td>
-                <td>{sub.status}</td>
-            </tr>
-        ))
-
-        setRows(rows)
-    }, [subscriptions]);
-
+function SubscriptionList({ rows }: SubscriptionListProps) {
 
     return (
         <Box sx={{ maxWidth: 700 }} mx="auto">

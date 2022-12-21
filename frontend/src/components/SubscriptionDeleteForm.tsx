@@ -1,13 +1,6 @@
 import { Box, Button, Group, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import axios from 'axios';
 
-function handleSubmit(event: any) {
-    axios.delete('https://happening.fdm.com.de/api/subscription?id=' + event.id)
-        .then(res => {
-            console.log(res);
-        })
-}
 
 interface SubscriptionDeleteFormProps {
     onSubmit: (event: any) => void;

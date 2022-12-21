@@ -1,6 +1,5 @@
 import { Box, Button, Group, Select, TextInput, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import axios from 'axios';
 
 
 interface SubscriptionAddFormProps {
