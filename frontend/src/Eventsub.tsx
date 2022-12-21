@@ -6,11 +6,8 @@ export default function Eventsub() {
 
     return (
         <div>
-            <br />
             <SubscriptionDeleteForm></SubscriptionDeleteForm>
-            <br />
             <SubscriptionAddForm></SubscriptionAddForm>
-            <br />
             <SubscriptionList></SubscriptionList>
         </div>
     );
