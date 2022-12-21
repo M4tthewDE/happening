@@ -1,11 +1,15 @@
-import Eventsub from './Eventsub';
+import { Navbar } from "@mantine/core";
+import Brand from "./Brand";
 
 function App() {
 
   return (
-    <div>
-      <Eventsub></Eventsub>
-    </div>
+    <Navbar height={600} p="xs" width={{ base: 300 }}>
+      <Navbar.Section>
+        <Brand />
+      </Navbar.Section>
+      <Navbar.Section grow mt="md">{/* Links sections */}</Navbar.Section>
+    </Navbar>
   );
 }
 
