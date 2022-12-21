@@ -3,7 +3,8 @@ import SubscriptionAddForm from "./components/SubscriptionAddForm";
 import SubscriptionDeleteForm from "./components/SubscriptionDeleteForm";
 import SubscriptionList from "./components/SubscriptionList";
 import { useEffect, useState } from "react";
-import { Box, Container, Grid, Group, Paper, Space } from "@mantine/core";
+import { ActionIcon, Box, Button, Container, Grid, Group, Paper, Space, Stack } from "@mantine/core";
+import { IconRefresh } from "@tabler/icons";
 
 
 interface SubscriptionIfc {
@@ -64,7 +65,12 @@ function Eventsub() {
             </Container>
             <Space h="xl" />
             <Container>
-                <SubscriptionList rows={rows}></SubscriptionList>
+                <Stack align="center">
+                    <SubscriptionList rows={rows}></SubscriptionList>
+                    <Button onClick={reloadSubs}>
+                        <IconRefresh></IconRefresh>
+                    </Button>
+                </Stack>
             </Container>
         </div >
     );
