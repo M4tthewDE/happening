@@ -3,7 +3,6 @@ package internal
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"log"
 	"os"
 
@@ -157,14 +156,8 @@ func PostSubscription(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 500
 	}
 
-	sub_type, err := newSubscriptionBody.getTypeString()
-	if err != nil {
-		log.Println(err)
-		return "", 500
-	}
-
 	_, err = client.CreateEventSubSubscription(&helix.EventSubSubscription{
-		Type:    sub_type,
+		Type:    newSubscriptionBody.SubType,
 		Version: "1",
 		Condition: helix.EventSubCondition{
 			BroadcasterUserID: newSubscriptionBody.TargetUserID,
@@ -186,17 +179,4 @@ func PostSubscription(request events.APIGatewayProxyRequest) (string, int) {
 type NewSubscriptionBody struct {
 	TargetUserID string `json:"target_id"`
 	SubType      string `json:"subscription_type"`
-}
-
-var ErrSubTypeNotFound = errors.New("sub type not found")
-
-func (s NewSubscriptionBody) getTypeString() (string, error) {
-	switch s.SubType {
-	case "FOLLOW":
-		return "channel.follow", nil
-	case "SUB":
-		return "channel.subscribe", nil
-	default:
-		return "", ErrSubTypeNotFound
-	}
 }

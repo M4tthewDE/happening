@@ -11,7 +11,7 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
         {
             initialValues: {
                 target_id: '',
-                subscription_type: 'FOLLOW',
+                subscription_type: 'channel.follow',
             },
         }
     );
@@ -37,8 +37,7 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
                     label="Type"
                     placeholder="Pick one"
                     data={[
-                        { value: 'FOLLOW', label: 'Follow' },
-                        { value: 'SUB', label: 'Subscription' },
+                        { value: 'channel.follow', label: 'Follow' },
                     ]}
                     {...form.getInputProps('subscription_type')}
                 />
