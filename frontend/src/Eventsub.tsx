@@ -3,6 +3,7 @@ import SubscriptionAddForm from "./components/SubscriptionAddForm";
 import SubscriptionDeleteForm from "./components/SubscriptionDeleteForm";
 import SubscriptionList from "./components/SubscriptionList";
 import { useEffect, useState } from "react";
+import { Box, Container, Grid, Group, Paper, Space } from "@mantine/core";
 
 
 interface SubscriptionIfc {
@@ -53,10 +54,19 @@ function Eventsub() {
 
     return (
         <div>
-            <SubscriptionDeleteForm parentSubmit={onDeleteSub}></SubscriptionDeleteForm>
-            <SubscriptionAddForm parentSubmit={onAddSub}></SubscriptionAddForm>
-            <SubscriptionList rows={rows}></SubscriptionList>
-        </div>
+            <Space h="xl" />
+            <Container size="xs">
+                <SubscriptionDeleteForm parentSubmit={onDeleteSub}></SubscriptionDeleteForm>
+            </Container>
+            <Space h="xl" />
+            <Container size="xs">
+                <SubscriptionAddForm parentSubmit={onAddSub}></SubscriptionAddForm>
+            </Container>
+            <Space h="xl" />
+            <Container>
+                <SubscriptionList rows={rows}></SubscriptionList>
+            </Container>
+        </div >
     );
 }
 

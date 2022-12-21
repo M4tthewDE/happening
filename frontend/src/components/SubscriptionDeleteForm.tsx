@@ -20,7 +20,7 @@ function SubscriptionDeleteForm({ parentSubmit }: SubscriptionDeleteFormProps) {
     }
 
     return (
-        <Box sx={{ maxWidth: 300 }} mx="auto">
+        <div>
             <Text fw={700}>Delete Subscription</Text>
             <form onSubmit={form.onSubmit(onSubmit)}>
                 <TextInput
@@ -32,7 +32,7 @@ function SubscriptionDeleteForm({ parentSubmit }: SubscriptionDeleteFormProps) {
                     <Button type="submit">Submit</Button>
                 </Group>
             </form>
-        </Box>
+        </div>
     );
 }
 

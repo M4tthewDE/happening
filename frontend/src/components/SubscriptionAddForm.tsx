@@ -23,7 +23,7 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
 
 
     return (
-        <Box sx={{ maxWidth: 300 }} mx="auto">
+        <div>
             <Text fw={700}>Add Subscription</Text>
             <form onSubmit={form.onSubmit(onSubmit)}>
                 <TextInput
@@ -47,7 +47,8 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
                     <Button type="submit">Submit</Button>
                 </Group>
             </form>
-        </Box>
+
+        </div>
     );
 }
 
