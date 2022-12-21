@@ -1,4 +1,4 @@
-import { Box, Table } from "@mantine/core";
+import { Table } from "@mantine/core";
 
 interface SubscriptionListProps {
     rows: any;

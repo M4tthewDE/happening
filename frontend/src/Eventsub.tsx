@@ -3,7 +3,7 @@ import SubscriptionAddForm from "./components/SubscriptionAddForm";
 import SubscriptionDeleteForm from "./components/SubscriptionDeleteForm";
 import SubscriptionList from "./components/SubscriptionList";
 import { useEffect, useState } from "react";
-import { ActionIcon, Box, Button, Container, Grid, Group, Paper, Space, Stack } from "@mantine/core";
+import { Button, Container, Space, Stack } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons";
 
 
