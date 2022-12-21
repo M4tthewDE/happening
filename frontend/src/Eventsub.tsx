@@ -13,7 +13,7 @@ interface SubscriptionIfc {
     status: string;
 }
 
-export default function Eventsub() {
+function Eventsub() {
     const [subscriptions, setSubscriptions] = useState<SubscriptionIfc[]>([])
     const [rows, setRows] = useState<any>([])
 
@@ -68,3 +68,5 @@ export default function Eventsub() {
         </div>
     );
 }
+
+export default Eventsub;

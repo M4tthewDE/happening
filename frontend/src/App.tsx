@@ -1,6 +1,6 @@
 import Eventsub from './Eventsub';
 
-export default function App() {
+function App() {
 
   return (
     <div>
@@ -8,3 +8,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
