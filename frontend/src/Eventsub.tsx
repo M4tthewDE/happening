@@ -4,7 +4,6 @@ import SubscriptionDeleteForm from "./components/SubscriptionDeleteForm";
 import SubscriptionList from "./components/SubscriptionList";
 import { useEffect, useState } from "react";
 
-const TEN_SECONDS = 10000
 
 interface SubscriptionIfc {
     id: string;
@@ -38,14 +37,6 @@ function Eventsub() {
                 reloadSubs()
             })
     }
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            reloadSubs();
-        }, TEN_SECONDS)
-
-        return () => clearInterval(interval);
-    }, []);
 
     useEffect(() => {
         const rows = subscriptions.map((sub) => (
