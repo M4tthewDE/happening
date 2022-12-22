@@ -1,5 +1,5 @@
 import { Group, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
-import { IconNotification, IconTimelineEvent } from "@tabler/icons";
+import { IconTimelineEvent } from "@tabler/icons";
 
 function Links() {
     return (
