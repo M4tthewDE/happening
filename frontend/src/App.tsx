@@ -1,18 +1,22 @@
-import { Navbar } from "@mantine/core";
+import { AppShell, Header, Navbar } from "@mantine/core";
 import Brand from "./Brand";
 import Links from "./Links";
+import Eventsub from "./Eventsub";
 
 function App() {
 
   return (
-    <Navbar height={600} p="xs" width={{ base: 300 }}>
-      <Navbar.Section>
+    <AppShell
+      padding="md"
+      navbar={<Navbar width={{ base: 300 }} height={500} p="xs">
+        <Links /></Navbar>
+      }
+      header={<Header height={60} p="xs">
         <Brand />
-      </Navbar.Section>
-      <Navbar.Section grow mt="md">{
-        <Links />
-      }</Navbar.Section>
-    </Navbar>
+      </Header>}
+    >
+      <Eventsub />
+    </AppShell>
   );
 }
 
