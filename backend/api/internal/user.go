@@ -53,7 +53,7 @@ func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 404
 	}
 
-	bodyBytes, err := json.Marshal(resp.Data)
+	bodyBytes, err := json.Marshal(resp.Data.Users[0])
 	if err != nil {
 		log.Println(err)
 		return "", 500
