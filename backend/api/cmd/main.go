@@ -21,6 +21,8 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 	switch request.PathParameters["proxy"] {
 	case "api/subscription":
 		body, status = subscriptionRequest(request)
+	case "api/user":
+		body, status = userRequest(request)
 	case "api/twitch":
 		body, status = twitchRequest(request)
 	default:
@@ -48,6 +50,17 @@ func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 		return internal.GetSubscriptions(request)
 	case "DELETE":
 		return internal.DeleteSubscription(request)
+	case "OPTIONS":
+		return "", 200
+	default:
+		return "", 405
+	}
+}
+
+func userRequest(request events.APIGatewayProxyRequest) (string, int) {
+	switch request.HTTPMethod {
+	case "GET":
+		return internal.GetUser(request)
 	case "OPTIONS":
 		return "", 200
 	default:
