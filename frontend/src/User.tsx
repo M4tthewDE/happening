@@ -1,9 +1,9 @@
-import UserToIdForm from "./components/user/UserToIdForm";
+import UserForm from "./components/user/UserToIdForm";
 
 function User() {
     return (
         <div>
-            <UserToIdForm />
+            <UserForm />
         </div>
     );
 }

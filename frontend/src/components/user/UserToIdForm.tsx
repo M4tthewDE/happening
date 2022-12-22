@@ -2,7 +2,7 @@ import { useForm } from "@mantine/form";
 import { Button, Container, Group, Text, TextInput } from '@mantine/core';
 import axios from "axios";
 
-function UserToIdForm() {
+function UserForm() {
     const form = useForm(
         {
             initialValues: {
@@ -17,11 +17,16 @@ function UserToIdForm() {
         })
     }
 
+    // TODO:
+    // - handle 404
+    // - add option to input id
+    // - display results
+
     return (
         <Container size="xs">
-            <Text fw={700}>User to ID</Text>
+            <Text fw={700}>User Information</Text>
             <form onSubmit={form.onSubmit(onSubmit)}>
-                <TextInput withAsterisk label="Username"
+                <TextInput withAsterisk label="Name"
                     {...form.getInputProps('name')}
                 />
                 <Group position="right" mt="md">
@@ -32,4 +37,4 @@ function UserToIdForm() {
     );
 }
 
-export default UserToIdForm;
+export default UserForm;
