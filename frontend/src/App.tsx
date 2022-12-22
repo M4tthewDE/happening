@@ -12,7 +12,7 @@ function App({ children }: AppProps) {
     <AppShell
       padding="md"
       navbar={
-        <Navbar width={{ base: 300 }} height={500} p="xs">
+        <Navbar width={{ base: 300 }} p="xs">
           <Links />
         </Navbar>
       }
