@@ -1,4 +1,4 @@
-import { Group, Space, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
+import { Group, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
 import { IconHome, IconTimelineEvent } from "@tabler/icons";
 import { Link } from "react-router-dom";
 
@@ -6,7 +6,7 @@ function Links() {
 
     return (
         <div>
-            <Link to={"/"}>
+            <Link to={"/"} style={{ textDecoration: 'none' }}>
                 <UnstyledButton
                     sx={(theme) => ({
                         display: 'block',
@@ -29,7 +29,7 @@ function Links() {
                     </Group>
                 </UnstyledButton >
             </Link>
-            <Link to={"/eventsub"}>
+            <Link to={"/eventsub"} style={{ textDecoration: 'none' }}>
                 <UnstyledButton
                     sx={(theme) => ({
                         display: 'block',
