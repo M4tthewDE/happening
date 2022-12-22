@@ -1,10 +1,10 @@
 import axios from "axios";
-import SubscriptionAddForm from "./components/SubscriptionAddForm";
-import SubscriptionDeleteForm from "./components/SubscriptionDeleteForm";
-import SubscriptionList from "./components/SubscriptionList";
 import { useEffect, useState } from "react";
 import { Button, Container, Space, Stack } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons";
+import SubscriptionAddForm from "./components/eventsub/SubscriptionAddForm";
+import SubscriptionDeleteForm from "./components/eventsub/SubscriptionDeleteForm";
+import SubscriptionList from "./components/eventsub/SubscriptionList";
 
 
 interface SubscriptionIfc {
