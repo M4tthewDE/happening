@@ -1,5 +1,6 @@
 import { useForm } from "@mantine/form";
 import { Button, Container, Group, Text, TextInput } from '@mantine/core';
+import axios from "axios";
 
 function UserToIdForm() {
     const form = useForm(
@@ -11,7 +12,9 @@ function UserToIdForm() {
     );
 
     function onSubmit(event: any) {
-        console.log(event.name)
+        axios.get('https://happening.fdm.com.de/api/user?name=' + event.name).then(res => {
+            console.log(res.data)
+        })
     }
 
     return (
