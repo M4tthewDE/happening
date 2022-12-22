@@ -8,6 +8,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import ErrorPage from './Error';
 import Eventsub from './Eventsub';
 import User from './User';
+import { NotificationsProvider } from '@mantine/notifications';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -34,7 +35,9 @@ const router = createBrowserRouter([
 root.render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <RouterProvider router={router} />
+      <NotificationsProvider>
+        <RouterProvider router={router} />
+      </NotificationsProvider>
     </MantineProvider>
   </React.StrictMode>
 );

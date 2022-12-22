@@ -1,6 +1,7 @@
 import { useForm } from "@mantine/form";
-import { Button, Container, Group, Text, TextInput, Notification } from '@mantine/core';
+import { Button, Container, Group, Text, TextInput } from '@mantine/core';
 import axios from "axios";
+import { showNotification } from "@mantine/notifications";
 
 function UserForm() {
     const form = useForm(
@@ -17,6 +18,10 @@ function UserForm() {
         }).catch((error) => {
             if (error.response) {
                 if (error.response.status === 404) {
+                    showNotification({
+                        message: 'User not found!',
+                        color: 'red',
+                    })
                 }
             }
         })
