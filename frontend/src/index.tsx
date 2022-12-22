@@ -4,15 +4,31 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { MantineProvider } from '@mantine/core';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import ErrorPage from './Error';
+import Eventsub from './Eventsub';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App>HELLO</App>,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/eventsub",
+    element: <App><Eventsub /></App>,
+    errorElement: <ErrorPage />,
+  },
+]);
+
 root.render(
   <React.StrictMode>
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <App />
+      <RouterProvider router={router} />
     </MantineProvider>
   </React.StrictMode>
 );
