@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form";
-import { Button, Container, Group, Text, TextInput } from '@mantine/core';
+import { Button, Container, Group, Text, TextInput, Notification } from '@mantine/core';
 import axios from "axios";
 
 function UserForm() {
@@ -14,6 +14,11 @@ function UserForm() {
     function onSubmit(event: any) {
         axios.get('https://happening.fdm.com.de/api/user?name=' + event.name).then(res => {
             console.log(res.data)
+        }).catch((error) => {
+            if (error.response) {
+                if (error.response.status === 404) {
+                }
+            }
         })
     }
 
