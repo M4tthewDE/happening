@@ -7,6 +7,7 @@ import { MantineProvider } from '@mantine/core';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import ErrorPage from './Error';
 import Eventsub from './Eventsub';
+import User from './User';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -15,7 +16,12 @@ const root = ReactDOM.createRoot(
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App>HELLO</App>,
+    element: <App>HOME</App>,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/user",
+    element: <App><User /></App>,
     errorElement: <ErrorPage />,
   },
   {
