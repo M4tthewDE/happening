@@ -49,6 +49,10 @@ func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 500
 	}
 
+	if len(resp.Data.Users) == 0 {
+		return "", 404
+	}
+
 	bodyBytes, err := json.Marshal(resp.Data)
 	if err != nil {
 		log.Println(err)
