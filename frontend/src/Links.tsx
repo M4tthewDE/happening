@@ -1,5 +1,5 @@
-import { Group, Text, UnstyledButton } from "@mantine/core";
-import { IconNotification } from "@tabler/icons";
+import { Group, Text, ThemeIcon, UnstyledButton } from "@mantine/core";
+import { IconNotification, IconTimelineEvent } from "@tabler/icons";
 
 function Links() {
     return (
@@ -18,7 +18,9 @@ function Links() {
             })}
         >
             <Group>
-                <IconNotification></IconNotification>
+                <ThemeIcon color="blue" variant="light">
+                    <IconTimelineEvent></IconTimelineEvent>
+                </ThemeIcon>
                 <Text>Eventsub</Text>
             </Group>
         </UnstyledButton>
