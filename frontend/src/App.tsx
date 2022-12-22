@@ -1,5 +1,6 @@
 import { Navbar } from "@mantine/core";
 import Brand from "./Brand";
+import Links from "./Links";
 
 function App() {
 
@@ -8,7 +9,9 @@ function App() {
       <Navbar.Section>
         <Brand />
       </Navbar.Section>
-      <Navbar.Section grow mt="md">{/* Links sections */}</Navbar.Section>
+      <Navbar.Section grow mt="md">{
+        <Links />
+      }</Navbar.Section>
     </Navbar>
   );
 }
