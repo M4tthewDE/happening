@@ -63,11 +63,6 @@ resource "aws_lambda_permission" "lambda_permission" {
   source_arn    = "${aws_api_gateway_deployment.api_deployment.execution_arn}/*/*"
 }
 
-locals {
-  sub_domain = "${var.app_env}-happening"
-}
-
-
 resource "aws_acm_certificate" "cert" {
   domain_name       = "${local.sub_domain}.fdm.com.de"
   validation_method = "DNS"
