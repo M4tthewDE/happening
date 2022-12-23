@@ -63,9 +63,13 @@ resource "aws_lambda_permission" "lambda_permission" {
   source_arn    = "${aws_api_gateway_deployment.api_deployment.execution_arn}/*/*"
 }
 
+locals {
+  sub_domain = var.APP_ENV == "prod" ? "happening" : "${var.APP_ENV}-happening"
+}
+
 
 resource "aws_acm_certificate" "cert" {
-  domain_name       = "${var.app_env}-happening.fdm.com.de"
+  domain_name       = "${local.sub_domain}.fdm.com.de"
   validation_method = "DNS"
 
   tags = {
@@ -79,7 +83,7 @@ resource "aws_acm_certificate_validation" "cert" {
 }
 
 resource "aws_api_gateway_domain_name" "happening" {
-  domain_name              = "${var.app_env}-happening.fdm.com.de"
+  domain_name              = "${local.sub_domain}.fdm.com.de"
   regional_certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
 
   endpoint_configuration {
@@ -115,7 +119,7 @@ resource "cloudflare_record" "verification" {
 
 resource "cloudflare_record" "happening" {
   zone_id = data.cloudflare_zone.zone.zone_id
-  name    = "${var.app_env}-happening"
+  name    = local.sub_domain
   type    = "CNAME"
   value   = aws_api_gateway_domain_name.happening.regional_domain_name
 

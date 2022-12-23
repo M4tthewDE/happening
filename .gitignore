@@ -2,7 +2,8 @@
 bin
 
 # env vars
-.env*
+.env
+.prod-env
 !.env.example
 
 # terraform
