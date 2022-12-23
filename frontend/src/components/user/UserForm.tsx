@@ -1,9 +1,11 @@
 import { useForm } from "@mantine/form";
 import { Button, Container, Group, Text, TextInput } from '@mantine/core';
-import axios from "axios";
-import { showNotification } from "@mantine/notifications";
 
-function UserForm() {
+interface UserFormProps {
+    parentSubmit: (event: any) => void;
+}
+
+function UserForm({ parentSubmit }: UserFormProps) {
     const form = useForm(
         {
             initialValues: {
@@ -13,24 +15,9 @@ function UserForm() {
     );
 
     function onSubmit(event: any) {
-        axios.get('https://happening.fdm.com.de/api/user?name=' + event.name).then(res => {
-            console.log(res.data)
-        }).catch((error) => {
-            if (error.response) {
-                if (error.response.status === 404) {
-                    showNotification({
-                        message: 'User not found!',
-                        color: 'red',
-                    })
-                }
-            }
-        })
+        form.reset()
+        parentSubmit(event);
     }
-
-    // TODO:
-    // - handle 404
-    // - add option to input id
-    // - display results
 
     return (
         <Container size="xs">

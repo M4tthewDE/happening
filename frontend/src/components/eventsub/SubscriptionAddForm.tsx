@@ -21,7 +21,6 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
         parentSubmit(event);
     }
 
-
     return (
         <div>
             <Text fw={700}>Add Subscription</Text>
