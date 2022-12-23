@@ -75,6 +75,7 @@ resource "aws_lambda_function" "lambda_func" {
     variables = {
       EVENTSUB_SECRET  = random_password.eventsub_secret.result
       TWITCH_CLIENT_ID = var.TWITCH_CLIENT_ID
+      API_URL          = var.API_URL
     }
   }
 }

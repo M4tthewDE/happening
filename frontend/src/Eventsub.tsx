@@ -18,16 +18,18 @@ function Eventsub() {
   const [rows, setRows] = useState<any>([]);
 
   function reloadSubs() {
-    axios.get("https://happening.fdm.com.de/api/subscription").then((res) => {
-      const subscriptions = res.data.subscriptions;
-      setSubscriptions(subscriptions);
-    });
+    axios
+      .get("https://beta-happening.fdm.com.de/api/subscription")
+      .then((res) => {
+        const subscriptions = res.data.subscriptions;
+        setSubscriptions(subscriptions);
+      });
   }
 
   function onAddSub(event: any) {
     console.log(event);
     axios
-      .post("https://happening.fdm.com.de/api/subscription", event)
+      .post("https://beta-happening.fdm.com.de/api/subscription", event)
       .then((_) => {
         reloadSubs();
       });
@@ -35,7 +37,9 @@ function Eventsub() {
 
   function onDeleteSub(event: any) {
     axios
-      .delete("https://happening.fdm.com.de/api/subscription?id=" + event.id)
+      .delete(
+        "https://beta-happening.fdm.com.de/api/subscription?id=" + event.id
+      )
       .then((_) => {
         reloadSubs();
       });

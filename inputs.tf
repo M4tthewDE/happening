@@ -38,3 +38,7 @@ variable "TWITCH_CLIENT_ID" {
   type      = string
   sensitive = true
 }
+
+variable "API_URL" {
+  type = string
+}
