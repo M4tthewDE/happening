@@ -30,8 +30,9 @@ function User() {
         }).catch((error) => {
             if (error.response) {
                 if (error.response.status === 404) {
+                    let message = formResponse.type === "name" ? `Name '${formResponse.value} not found'` : `ID '${formResponse.value}' not found`;
                     showNotification({
-                        message: 'User not found!',
+                        message: message,
                         color: 'red',
                     })
                 }
