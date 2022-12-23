@@ -41,9 +41,20 @@ func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 500
 	}
 
-	name := request.QueryStringParameters["name"]
+	var params helix.UsersParams
+	name, ok := request.QueryStringParameters["name"]
+	if ok {
+		params = helix.UsersParams{Logins: []string{name}}
+	} else {
+		id, ok := request.QueryStringParameters["id"]
+		if !ok {
+			return "", 404
+		}
 
-	resp, err := client.GetUsers(&helix.UsersParams{Logins: []string{name}})
+		params = helix.UsersParams{IDs: []string{id}}
+	}
+
+	resp, err := client.GetUsers(&params)
 	if err != nil {
 		log.Println(err)
 		return "", 500
