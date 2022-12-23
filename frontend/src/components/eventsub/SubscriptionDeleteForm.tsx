@@ -1,4 +1,4 @@
-import { Button, Group, Text, TextInput } from "@mantine/core";
+import { Button, Group, Space, Text, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 interface SubscriptionDeleteFormProps {
@@ -19,6 +19,7 @@ function SubscriptionDeleteForm({ parentSubmit }: SubscriptionDeleteFormProps) {
   return (
     <div>
       <Text fw={700}>Delete Subscription</Text>
+      <Space h="md" />
       <form onSubmit={form.onSubmit(onSubmit)}>
         <TextInput withAsterisk label="ID" {...form.getInputProps("id")} />
         <Group position="right" mt="md">

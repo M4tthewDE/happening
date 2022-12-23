@@ -1,4 +1,4 @@
-import { Button, Group, Select, TextInput, Text } from "@mantine/core";
+import { Button, Group, Select, TextInput, Text, Space } from "@mantine/core";
 import { useForm } from "@mantine/form";
 
 interface SubscriptionAddFormProps {
@@ -21,6 +21,7 @@ function SubscriptionAddForm({ parentSubmit }: SubscriptionAddFormProps) {
   return (
     <div>
       <Text fw={700}>Add Subscription</Text>
+      <Space h="md" />
       <form onSubmit={form.onSubmit(onSubmit)}>
         <TextInput
           withAsterisk
