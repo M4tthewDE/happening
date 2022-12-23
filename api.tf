@@ -1,16 +1,3 @@
-variable "app_name" {
-  description = "Application name"
-  default     = "happening"
-}
-
-resource "random_id" "unique_suffix" {
-  byte_length = 2
-}
-
-locals {
-  app_id = "${lower(var.app_name)}-${lower(var.app_env)}-${random_id.unique_suffix.hex}"
-}
-
 resource "random_password" "eventsub_secret" {
   length  = 32
   special = false
