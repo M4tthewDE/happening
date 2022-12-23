@@ -20,7 +20,7 @@ function User() {
   const [user, setUser] = useState<UserIfc | undefined>(undefined);
 
   function onSubmit(formResponse: FormResponseIfc) {
-    const url_base = "https://beta-happening.fdm.com.de/api/user";
+    const url_base = process.env.REACT_APP_API_DOMAIN + "/user";
     let url =
       formResponse.type === "name" ? url_base + "?name=" : url_base + "?id=";
     url += formResponse.value;

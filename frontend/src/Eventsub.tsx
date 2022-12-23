@@ -19,7 +19,7 @@ function Eventsub() {
 
   function reloadSubs() {
     axios
-      .get("https://beta-happening.fdm.com.de/api/subscription")
+      .get(process.env.REACT_APP_API_DOMAIN + "/subscription")
       .then((res) => {
         const subscriptions = res.data.subscriptions;
         setSubscriptions(subscriptions);
@@ -29,7 +29,7 @@ function Eventsub() {
   function onAddSub(event: any) {
     console.log(event);
     axios
-      .post("https://beta-happening.fdm.com.de/api/subscription", event)
+      .post(process.env.REACT_APP_API_DOMAIN + "/subscription", event)
       .then((_) => {
         reloadSubs();
       });
@@ -37,9 +37,7 @@ function Eventsub() {
 
   function onDeleteSub(event: any) {
     axios
-      .delete(
-        "https://beta-happening.fdm.com.de/api/subscription?id=" + event.id
-      )
+      .delete(process.env.REACT_APP_API_DOMAIN + "/subscription?id=" + event.id)
       .then((_) => {
         reloadSubs();
       });
