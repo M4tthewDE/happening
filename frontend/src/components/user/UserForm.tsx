@@ -1,5 +1,5 @@
 import { useForm } from "@mantine/form";
-import { Button, Container, Group, Text, TextInput } from '@mantine/core';
+import { Button, Container, Group, Space, Text, TextInput } from '@mantine/core';
 
 interface UserFormProps {
     parentSubmit: (event: any) => void;
@@ -22,6 +22,7 @@ function UserForm({ parentSubmit }: UserFormProps) {
     return (
         <Container size="xs">
             <Text fw={700}>User Information</Text>
+            <Space h="md" />
             <form onSubmit={form.onSubmit(onSubmit)}>
                 <TextInput withAsterisk label="Name"
                     {...form.getInputProps('name')}
