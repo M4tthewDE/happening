@@ -7,10 +7,6 @@ variable "aws_region" {
   default = "us-east-1"
 }
 
-variable "APP_ENV" {
-  description = "Application environment tag"
-}
-
 resource "random_id" "unique_suffix" {
   byte_length = 2
 }
@@ -20,6 +16,11 @@ variable "app_name" {
   default     = "happening"
 }
 
+variable "app_env" {
+  description = "Environment name"
+  default     = "beta"
+}
+
 locals {
-  app_id = "${lower(var.app_name)}-${lower(var.APP_ENV)}-${random_id.unique_suffix.hex}"
+  app_id = "${lower(var.app_name)}-${lower(var.app_env)}-${random_id.unique_suffix.hex}"
 }

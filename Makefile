@@ -18,15 +18,3 @@ apply:
 .PHONY: destroy
 destroy:
 	@./scripts/with-env.sh terraform destroy --auto-approve 
-
-.PHONY: plan 
-plan-prod:
-	@./scripts/with-prod-env.sh terraform plan 
-
-.PHONY: apply 
-apply-prod:
-	@./scripts/with-prod-env.sh terraform apply --auto-approve 
-
-.PHONY: destroy
-destroy-prod:
-	@./scripts/with-prod-env.sh terraform destroy --auto-approve 

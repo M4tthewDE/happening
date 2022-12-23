@@ -64,7 +64,7 @@ resource "aws_lambda_permission" "lambda_permission" {
 }
 
 locals {
-  sub_domain = var.APP_ENV == "prod" ? "happening" : "${var.APP_ENV}-happening"
+  sub_domain = "${var.app_env}-happening"
 }
 
 
