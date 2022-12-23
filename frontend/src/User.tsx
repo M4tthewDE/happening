@@ -11,11 +11,20 @@ export interface UserIfc {
     created_at: string;
 }
 
+interface FormResponseIfc {
+    value: string;
+    type: "name" | "id";
+}
+
 function User() {
     const [user, setUser] = useState<UserIfc | undefined>(undefined)
 
-    function onSubmit(event: any) {
-        axios.get('https://happening.fdm.com.de/api/user?name=' + event.name).then(res => {
+    function onSubmit(formResponse: FormResponseIfc) {
+        const url_base = 'https://happening.fdm.com.de/api/user';
+        let url = formResponse.type === "name" ? url_base + '?name=' : url_base + '?id=';
+        url += formResponse.value
+
+        axios.get(url).then(res => {
             let newUser: UserIfc = { id: res.data.id, login: res.data.login, created_at: res.data.created_at }
             setUser(newUser)
         }).catch((error) => {
