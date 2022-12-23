@@ -1,17 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 
-import { MantineProvider } from '@mantine/core';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import ErrorPage from './Error';
-import Eventsub from './Eventsub';
-import User from './User';
-import { NotificationsProvider } from '@mantine/notifications';
+import { MantineProvider } from "@mantine/core";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import ErrorPage from "./Error";
+import Eventsub from "./Eventsub";
+import User from "./User";
+import { NotificationsProvider } from "@mantine/notifications";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
+  document.getElementById("root") as HTMLElement
 );
 
 const router = createBrowserRouter([
@@ -22,12 +22,20 @@ const router = createBrowserRouter([
   },
   {
     path: "/user",
-    element: <App><User /></App>,
+    element: (
+      <App>
+        <User />
+      </App>
+    ),
     errorElement: <ErrorPage />,
   },
   {
     path: "/eventsub",
-    element: <App><Eventsub /></App>,
+    element: (
+      <App>
+        <Eventsub />
+      </App>
+    ),
     errorElement: <ErrorPage />,
   },
 ]);
