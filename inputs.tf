@@ -28,3 +28,13 @@ locals {
 locals {
   sub_domain = "${var.app_env}-happening"
 }
+
+variable "TWITCH_SECRET" {
+  type      = string
+  sensitive = true
+}
+
+variable "TWITCH_CLIENT_ID" {
+  type      = string
+  sensitive = true
+}

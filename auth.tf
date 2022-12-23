@@ -1,13 +1,3 @@
-variable "TWITCH_SECRET" {
-  type      = string
-  sensitive = true
-}
-
-variable "TWITCH_CLIENT_ID" {
-  type      = string
-  sensitive = true
-}
-
 data "archive_file" "auth_zip" {
   type        = "zip"
   source_file = "bin/auth"
