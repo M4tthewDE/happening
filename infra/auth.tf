@@ -1,7 +1,7 @@
 data "archive_file" "auth_zip" {
   type        = "zip"
-  source_file = "bin/auth"
-  output_path = "bin/auth.zip"
+  source_file = "../bin/auth"
+  output_path = "../bin/auth.zip"
 }
 
 resource "aws_lambda_function" "auth_lambda" {

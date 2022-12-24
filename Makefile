@@ -4,17 +4,24 @@ build:
 	GOOS=linux CGO_ENABLED=0 go build -o ./bin/auth ./backend/auth/...
 
 .PHONY: init 
+.ONESHELL:
 init:
-	@./scripts/with-env.sh terraform init 
+	@../scripts/with-env.sh terraform init 
 
+.ONESHELL:
 .PHONY: plan 
 plan:
-	@./scripts/with-env.sh terraform plan 
+	cd infra
+	@../scripts/with-env.sh terraform plan
 
 .PHONY: apply 
+.ONESHELL:
 apply:
-	@./scripts/with-env.sh terraform apply --auto-approve 
+	cd infra
+	@../scripts/with-env.sh terraform apply --auto-approve 
 
 .PHONY: destroy
+.ONESHELL:
 destroy:
-	@./scripts/with-env.sh terraform destroy --auto-approve 
+	cd infra
+	@../scripts/with-env.sh terraform destroy --auto-approve 

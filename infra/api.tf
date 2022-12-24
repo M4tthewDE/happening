@@ -59,8 +59,8 @@ resource "aws_iam_policy_attachment" "role_attach" {
 
 data "archive_file" "lambda_zip" {
   type        = "zip"
-  source_file = "bin/api"
-  output_path = "bin/api.zip"
+  source_file = "../bin/api"
+  output_path = "../bin/api.zip"
 }
 
 resource "aws_lambda_function" "lambda_func" {
