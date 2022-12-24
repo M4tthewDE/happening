@@ -6,22 +6,23 @@ build:
 .PHONY: init 
 .ONESHELL:
 init:
-	@../scripts/with-env.sh terraform init 
+	cd infra/beta
+	@../../scripts/with-env.sh terraform init 
 
 .ONESHELL:
 .PHONY: plan 
 plan:
-	cd infra
-	@../scripts/with-env.sh terraform plan
+	cd infra/beta
+	@../../scripts/with-env.sh terraform plan
 
 .PHONY: apply 
 .ONESHELL:
 apply:
-	cd infra
-	@../scripts/with-env.sh terraform apply --auto-approve 
+	cd infra/beta
+	@../../scripts/with-env.sh terraform apply --auto-approve 
 
 .PHONY: destroy
 .ONESHELL:
 destroy:
-	cd infra
-	@../scripts/with-env.sh terraform destroy --auto-approve 
+	cd infra/beta
+	@../../scripts/with-env.sh terraform destroy --auto-approve 
