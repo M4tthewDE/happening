@@ -16,6 +16,7 @@ resource "aws_lambda_function" "auth_lambda" {
     variables = {
       TWITCH_SECRET    = var.TWITCH_SECRET
       TWITCH_CLIENT_ID = var.TWITCH_CLIENT_ID
+      TABLE_NAME       = "auth-${local.app_id}"
     }
   }
 }

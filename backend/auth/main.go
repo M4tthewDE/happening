@@ -15,11 +15,6 @@ import (
 	"github.com/nicklaw5/helix/v2"
 )
 
-const (
-	table_name = "auth"
-	hash_key   = "id"
-)
-
 type DB struct {
 	ddb *dynamodb.Client
 }
@@ -30,9 +25,9 @@ func NewDao(ddb *dynamodb.Client) *DB {
 
 func (d DB) DeleteAuth(ctx context.Context, id string) error {
 	_, err := d.ddb.DeleteItem(ctx, &dynamodb.DeleteItemInput{
-		TableName: aws.String(table_name),
+		TableName: aws.String(os.Getenv("TABLE_NAME")),
 		Key: map[string]types.AttributeValue{
-			hash_key: &types.AttributeValueMemberS{Value: id},
+			"id": &types.AttributeValueMemberS{Value: id},
 		},
 	})
 
@@ -41,7 +36,7 @@ func (d DB) DeleteAuth(ctx context.Context, id string) error {
 
 func (d DB) GetAuth(ctx context.Context) (string, string, bool, error) {
 	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
-		TableName: aws.String(table_name),
+		TableName: aws.String(os.Getenv("TABLE_NAME")),
 	})
 	if err != nil {
 		return "", "", false, err
@@ -58,9 +53,9 @@ func (d DB) GetAuth(ctx context.Context) (string, string, bool, error) {
 
 func (d DB) SaveAuth(ctx context.Context, token string) error {
 	d.ddb.PutItem(ctx, &dynamodb.PutItemInput{
-		TableName: aws.String(table_name),
+		TableName: aws.String(os.Getenv("TABLE_NAME")),
 		Item: map[string]types.AttributeValue{
-			hash_key:       &types.AttributeValueMemberS{Value: uuid.New().String()},
+			"id":           &types.AttributeValueMemberS{Value: uuid.New().String()},
 			"access_token": &types.AttributeValueMemberS{Value: token},
 		},
 	})

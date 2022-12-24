@@ -2,15 +2,11 @@ package internal
 
 import (
 	"context"
+	"os"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
-)
-
-const (
-	table_name = "auth"
-	hash_key   = "id"
 )
 
 type DB struct {
@@ -23,7 +19,7 @@ func NewDao(ddb *dynamodb.Client) *DB {
 
 func (d DB) GetAuth(ctx context.Context) (string, error) {
 	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
-		TableName: aws.String(table_name),
+		TableName: aws.String(os.Getenv("TABLE_NAME")),
 	})
 	if err != nil {
 		return "", err
