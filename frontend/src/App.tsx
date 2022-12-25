@@ -1,13 +1,20 @@
 import { AppShell, Header, Navbar } from "@mantine/core";
 import Brand from "./Brand";
 import Links from "./Links";
+import { v4 as uuidv4 } from "uuid";
 
 interface AppProps {
   children: any;
 }
 
 function App({ children }: AppProps) {
-  console.log("test");
+  const state = uuidv4();
+  localStorage.setItem("state", state);
+
+  if (localStorage.getItem("user_token") === null) {
+    console.log(process.env);
+    window.location.href = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${process.env.REACT_APP_TWITCH_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_AUTH_PATH}&scope=&state=${state}`;
+  }
 
   return (
     <AppShell
