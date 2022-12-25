@@ -22,6 +22,11 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
+    path: "/disallowed",
+    element: <>NOT ALLOWED (YET)</>,
+    errorElement: <ErrorPage />,
+  },
+  {
     path: "/auth",
     element: <Auth />,
     errorElement: <ErrorPage />,
