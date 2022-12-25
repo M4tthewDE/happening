@@ -3,7 +3,7 @@ import Brand from "./Brand";
 import Links from "./Links";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 
 interface AppProps {
