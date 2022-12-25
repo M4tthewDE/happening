@@ -8,8 +8,10 @@ interface AppProps {
 }
 
 function App({ children }: AppProps) {
-  const state = uuidv4();
-  localStorage.setItem("state", state);
+  if (localStorage.getItem("state") === null) {
+    const state = uuidv4();
+    localStorage.setItem("state", state);
+  }
 
   if (localStorage.getItem("user_token") === null) {
     console.log(process.env);
