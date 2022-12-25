@@ -13,7 +13,7 @@ function App({ children }: AppProps) {
 
   if (localStorage.getItem("user_token") === null) {
     console.log(process.env);
-    window.location.href = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${process.env.REACT_APP_TWITCH_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_AUTH_PATH}&scope=&state=${state}`;
+    window.location.href = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${process.env.REACT_APP_TWITCH_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_PATH}/auth&scope=&state=${state}&force_verify=true`;
   }
 
   return (

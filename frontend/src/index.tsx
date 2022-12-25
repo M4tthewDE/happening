@@ -9,6 +9,7 @@ import ErrorPage from "./Error";
 import Eventsub from "./Eventsub";
 import User from "./User";
 import { NotificationsProvider } from "@mantine/notifications";
+import Auth from "./Auth";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -18,6 +19,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App>HOME</App>,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/auth",
+    element: <Auth />,
     errorElement: <ErrorPage />,
   },
   {
