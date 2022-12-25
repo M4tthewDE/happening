@@ -25,8 +25,8 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 		body, status = userRequest(request)
 	case "api/twitch":
 		body, status = twitchRequest(request)
-	case "api/auth":
-		body, status = authRequest(request)
+	case "api/permissions":
+		body, status = permissionsRequest(request)
 	default:
 		body = ""
 		status = 404
@@ -79,7 +79,7 @@ func twitchRequest(request events.APIGatewayProxyRequest) (string, int) {
 	}
 }
 
-func authRequest(request events.APIGatewayProxyRequest) (string, int) {
+func permissionsRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "GET":
 		return internal.GetPermissions(request)
