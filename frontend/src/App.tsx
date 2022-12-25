@@ -7,6 +7,8 @@ interface AppProps {
 }
 
 function App({ children }: AppProps) {
+  console.log("test");
+
   return (
     <AppShell
       padding="md"
