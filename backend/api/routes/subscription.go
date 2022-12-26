@@ -1,4 +1,4 @@
-package internal
+package routes
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/m4tthewde/happening/backend/api/internal"
 	"github.com/nicklaw5/helix"
 )
 
@@ -24,7 +25,7 @@ func DeleteSubscription(request events.APIGatewayProxyRequest) (string, int) {
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
-	d := NewDao(dbClient)
+	d := internal.NewDao(dbClient)
 
 	token, err := d.GetAuth(ctx)
 	if err != nil {
@@ -73,7 +74,7 @@ func GetSubscriptions(request events.APIGatewayProxyRequest) (string, int) {
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
-	d := NewDao(dbClient)
+	d := internal.NewDao(dbClient)
 
 	token, err := d.GetAuth(ctx)
 	if err != nil {
@@ -139,7 +140,7 @@ func PostSubscription(request events.APIGatewayProxyRequest) (string, int) {
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
-	d := NewDao(dbClient)
+	d := internal.NewDao(dbClient)
 
 	token, err := d.GetAuth(ctx)
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/m4tthewde/happening/backend/api/internal"
+	"github.com/m4tthewde/happening/backend/api/routes"
 )
 
 func main() {
@@ -47,11 +47,11 @@ func distributeRequest(request events.APIGatewayProxyRequest) (events.APIGateway
 func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "POST":
-		return internal.PostSubscription(request)
+		return routes.PostSubscription(request)
 	case "GET":
-		return internal.GetSubscriptions(request)
+		return routes.GetSubscriptions(request)
 	case "DELETE":
-		return internal.DeleteSubscription(request)
+		return routes.DeleteSubscription(request)
 	case "OPTIONS":
 		return "", 200
 	default:
@@ -62,7 +62,7 @@ func subscriptionRequest(request events.APIGatewayProxyRequest) (string, int) {
 func userRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "GET":
-		return internal.GetUser(request)
+		return routes.GetUser(request)
 	case "OPTIONS":
 		return "", 200
 	default:
@@ -73,7 +73,7 @@ func userRequest(request events.APIGatewayProxyRequest) (string, int) {
 func twitchRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "POST":
-		return internal.HandleNewEventsubEvent(request)
+		return routes.HandleNewEventsubEvent(request)
 	default:
 		return "", 405
 	}
@@ -82,7 +82,7 @@ func twitchRequest(request events.APIGatewayProxyRequest) (string, int) {
 func permissionsRequest(request events.APIGatewayProxyRequest) (string, int) {
 	switch request.HTTPMethod {
 	case "GET":
-		return internal.GetPermissions(request)
+		return routes.GetPermissions(request)
 	case "OPTIONS":
 		return "", 200
 	default:

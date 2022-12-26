@@ -1,17 +1,19 @@
-package internal
+package routes
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/m4tthewde/happening/backend/api/internal"
 	"github.com/nicklaw5/helix"
 )
 
-func GetPermissions(request events.APIGatewayProxyRequest) (string, int) {
+func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 	ctx := context.TODO()
 	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
@@ -23,11 +25,12 @@ func GetPermissions(request events.APIGatewayProxyRequest) (string, int) {
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
-	d := NewDao(dbClient)
+	d := internal.NewDao(dbClient)
 
-	token, ok := request.QueryStringParameters["token"]
-	if !ok {
-		return "", 400
+	token, err := d.GetAuth(ctx)
+	if err != nil {
+		log.Println(err)
+		return "", 500
 	}
 
 	client, err := helix.NewClient(&helix.Options{
@@ -39,29 +42,34 @@ func GetPermissions(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 500
 	}
 
-	isValid, resp, err := client.ValidateToken(token)
+	var params helix.UsersParams
+	name, ok := request.QueryStringParameters["name"]
+	if ok {
+		params = helix.UsersParams{Logins: []string{name}}
+	} else {
+		id, ok := request.QueryStringParameters["id"]
+		if !ok {
+			return "", 404
+		}
+
+		params = helix.UsersParams{IDs: []string{id}}
+	}
+
+	resp, err := client.GetUsers(&params)
 	if err != nil {
 		log.Println(err)
 		return "", 500
 	}
 
-	if !isValid {
-		return "", 403
+	if len(resp.Data.Users) == 0 {
+		return "", 404
 	}
 
-	if resp.Data.ClientID != os.Getenv("TWITCH_CLIENT_ID") {
-		return "", 403
-	}
-
-	isAllowed, err := d.GetPermissions(ctx, resp.Data.UserID)
+	bodyBytes, err := json.Marshal(resp.Data.Users[0])
 	if err != nil {
 		log.Println(err)
 		return "", 500
 	}
 
-	if isAllowed {
-		return "", 200
-	}
-
-	return "", 403
+	return string(bodyBytes), 200
 }

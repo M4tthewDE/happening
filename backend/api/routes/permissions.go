@@ -1,18 +1,18 @@
-package internal
+package routes
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/m4tthewde/happening/backend/api/internal"
 	"github.com/nicklaw5/helix"
 )
 
-func GetUser(request events.APIGatewayProxyRequest) (string, int) {
+func GetPermissions(request events.APIGatewayProxyRequest) (string, int) {
 	ctx := context.TODO()
 	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
 		o.Region = "us-east-1"
@@ -24,12 +24,11 @@ func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 	}
 
 	dbClient := dynamodb.NewFromConfig(cfg)
-	d := NewDao(dbClient)
+	d := internal.NewDao(dbClient)
 
-	token, err := d.GetAuth(ctx)
-	if err != nil {
-		log.Println(err)
-		return "", 500
+	token, ok := request.QueryStringParameters["token"]
+	if !ok {
+		return "", 400
 	}
 
 	client, err := helix.NewClient(&helix.Options{
@@ -41,34 +40,29 @@ func GetUser(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 500
 	}
 
-	var params helix.UsersParams
-	name, ok := request.QueryStringParameters["name"]
-	if ok {
-		params = helix.UsersParams{Logins: []string{name}}
-	} else {
-		id, ok := request.QueryStringParameters["id"]
-		if !ok {
-			return "", 404
-		}
-
-		params = helix.UsersParams{IDs: []string{id}}
-	}
-
-	resp, err := client.GetUsers(&params)
+	isValid, resp, err := client.ValidateToken(token)
 	if err != nil {
 		log.Println(err)
 		return "", 500
 	}
 
-	if len(resp.Data.Users) == 0 {
-		return "", 404
+	if !isValid {
+		return "", 403
 	}
 
-	bodyBytes, err := json.Marshal(resp.Data.Users[0])
+	if resp.Data.ClientID != os.Getenv("TWITCH_CLIENT_ID") {
+		return "", 403
+	}
+
+	isAllowed, err := d.GetPermissions(ctx, resp.Data.UserID)
 	if err != nil {
 		log.Println(err)
 		return "", 500
 	}
 
-	return string(bodyBytes), 200
+	if isAllowed {
+		return "", 200
+	}
+
+	return "", 403
 }
