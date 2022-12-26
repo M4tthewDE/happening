@@ -3,20 +3,17 @@ import Brand from "./Brand";
 import Links from "./Links";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import React from "react";
+import { useEffect, useState } from "react";
 
 interface AppProps {
   children: any;
 }
 
-interface PermissionsIfc {
-  permissions: string[];
-}
-
 function App({ children }: AppProps) {
+  const [authenticated, setAuthenticated] = useState(false);
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (localStorage.getItem("user_token") === null) {
       window.location.href = `https://id.twitch.tv/oauth2/authorize?response_type=token&client_id=${process.env.REACT_APP_TWITCH_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_PATH}/auth&scope=&force_verify=true`;
     } else {
@@ -24,41 +21,37 @@ function App({ children }: AppProps) {
 
       axios
         .get(`${process.env.REACT_APP_API_DOMAIN}/permissions?token=${token}`)
-        .then((res) => {
-          console.log(res.data);
-          const permissions: PermissionsIfc = {
-            permissions: res.data,
-          };
-          if (!permissions.permissions.includes("ALL")) {
-            navigate("/disallowed");
-          }
+        .then(() => {
+          setAuthenticated(true);
         })
         .catch((error) => {
           if (error.response) {
-            if (error.response.status === 403) {
-              navigate("/disallowed");
-            }
+            navigate("/disallowed");
           }
         });
     }
-  });
+  }, [navigate]);
 
   return (
-    <AppShell
-      padding="md"
-      navbar={
-        <Navbar width={{ base: 300 }} p="xs">
-          <Links />
-        </Navbar>
-      }
-      header={
-        <Header height={60} p="xs">
-          <Brand />
-        </Header>
-      }
-    >
-      {children}
-    </AppShell>
+    <>
+      {authenticated && (
+        <AppShell
+          padding="md"
+          navbar={
+            <Navbar width={{ base: 300 }} p="xs">
+              <Links />
+            </Navbar>
+          }
+          header={
+            <Header height={60} p="xs">
+              <Brand />
+            </Header>
+          }
+        >
+          {children}
+        </AppShell>
+      )}
+    </>
   );
 }
 
