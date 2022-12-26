@@ -2,23 +2,36 @@ package internal
 
 import (
 	"context"
+	"log"
 	"os"
 
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/aws-sdk-go/aws"
 )
 
-type DB struct {
-	ddb *dynamodb.Client
+func getDdb(ctx context.Context) (*dynamodb.Client, error) {
+	cfg, err := config.LoadDefaultConfig(ctx, func(o *config.LoadOptions) error {
+		o.Region = "us-east-1"
+		return nil
+	})
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return dynamodb.NewFromConfig(cfg), nil
+
 }
 
-func NewDao(ddb *dynamodb.Client) *DB {
-	return &DB{ddb: ddb}
-}
+func GetAuth(ctx context.Context) (string, error) {
+	ddb, err := getDdb(ctx)
+	if err != nil {
+		return "", err
+	}
 
-func (d DB) GetAuth(ctx context.Context) (string, error) {
-	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
+	out, err := ddb.Scan(ctx, &dynamodb.ScanInput{
 		TableName: aws.String(os.Getenv("TABLE_NAME")),
 	})
 	if err != nil {
@@ -33,8 +46,13 @@ func (d DB) GetAuth(ctx context.Context) (string, error) {
 	return token, nil
 }
 
-func (d DB) GetPermissions(ctx context.Context, user_id string) (bool, error) {
-	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
+func GetPermissions(ctx context.Context, user_id string) (bool, error) {
+	ddb, err := getDdb(ctx)
+	if err != nil {
+		return false, err
+	}
+
+	out, err := ddb.Scan(ctx, &dynamodb.ScanInput{
 		TableName:        aws.String(os.Getenv("PERMISSIONS_TABLE_NAME")),
 		FilterExpression: aws.String("user_id = :uid"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
