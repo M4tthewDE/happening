@@ -33,7 +33,7 @@ func (d DB) GetAuth(ctx context.Context) (string, error) {
 	return token, nil
 }
 
-func (d DB) GetPermissions(ctx context.Context, user_id string) ([]string, error) {
+func (d DB) GetPermissions(ctx context.Context, user_id string) (bool, error) {
 	out, err := d.ddb.Scan(ctx, &dynamodb.ScanInput{
 		TableName:        aws.String(os.Getenv("PERMISSIONS_TABLE_NAME")),
 		FilterExpression: aws.String("user_id = :uid"),
@@ -42,13 +42,12 @@ func (d DB) GetPermissions(ctx context.Context, user_id string) ([]string, error
 		},
 	})
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	if len(out.Items) == 0 {
-		return make([]string, 0), nil
+		return false, nil
 	}
 
-	permissions := out.Items[0]["permissions"].(*types.AttributeValueMemberSS).Value
-	return permissions, nil
+	return true, nil
 }

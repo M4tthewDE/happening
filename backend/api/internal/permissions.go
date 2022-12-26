@@ -2,7 +2,6 @@ package internal
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"os"
 
@@ -54,17 +53,15 @@ func GetPermissions(request events.APIGatewayProxyRequest) (string, int) {
 		return "", 403
 	}
 
-	permissions, err := d.GetPermissions(ctx, resp.Data.UserID)
+	isAllowed, err := d.GetPermissions(ctx, resp.Data.UserID)
 	if err != nil {
 		log.Println(err)
 		return "", 500
 	}
 
-	bodyBytes, err := json.Marshal(permissions)
-	if err != nil {
-		log.Println(err)
-		return "", 500
+	if isAllowed {
+		return "", 200
 	}
 
-	return string(bodyBytes), 200
+	return "", 403
 }

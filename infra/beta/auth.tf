@@ -83,8 +83,7 @@ resource "aws_dynamodb_table_item" "default_permission" {
   item = <<ITEM
   {
     "id": {"S": "${uuid()}"},
-    "user_id": {"S": "116672490"},
-    "permissions": {"SS": ["ALL"]}
+    "user_id": {"S": "116672490"}
   }
   ITEM
 }
