@@ -1,7 +1,6 @@
 import { AppShell, Header, Navbar } from "@mantine/core";
 import Brand from "./Brand";
 import Links from "./Links";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import React from "react";
