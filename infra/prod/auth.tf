@@ -41,19 +41,3 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_auth_lambda" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.auth.arn
 }
-resource "aws_dynamodb_table" "auth-table" {
-  name         = "auth-${local.app_id}"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-  range_key    = "access_token"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-
-  attribute {
-    name = "access_token"
-    type = "S"
-  }
-}
